@@ -181,6 +181,7 @@ local flipcoin = false
 local charges = 2
 local toggleinkognito = true
 local device = "Disable"
+local curdevice = ""
 local changingdevice = false
 local dusekprotection = false
 local makepizzabigger = false
@@ -2204,12 +2205,13 @@ local function NameProtect(state)
 end
 
 local function startchangedevice()
-    while task.wait(0.5) do
-        if device == "Disable" then continue end
+    while task.wait(1) do
+        if device == "Disable" or curdevice == device then continue end
 
         mainremote:FireServer("SetDevice", {
             [1] = tostring(device)
         })
+        curdevice = device
     end
 end
 
