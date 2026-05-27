@@ -5,7 +5,7 @@ end
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local scriptversion = "v1.0.2"
-local updateperiod = "25/05/2026"
+local updateperiod = "27/05/2026"
 
 local Window = Rayfield:CreateWindow({
     Name = "Sigmasaken",
@@ -7067,7 +7067,5 @@ task.spawn(function()
 	game:GetService("ReplicatedStorage"):WaitForChild("Modules", 10):WaitForChild("Network", 10):WaitForChild("Network", 10):WaitForChild("RemoteEvent", 10):FireServer(unpack(args))
 end)
 ]]
-
-
 
 
