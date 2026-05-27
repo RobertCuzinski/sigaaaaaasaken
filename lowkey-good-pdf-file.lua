@@ -1,10 +1,11 @@
+task.spawn(function()
 if not isfolder("TheSigmaHub") then
     makefolder("TheSigmaHub")
 end
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local scriptversion = "v1.0.2"
+local scriptversion = "v1.0.3"
 local updateperiod = "27/05/2026"
 
 local Window = Rayfield:CreateWindow({
@@ -245,6 +246,9 @@ local ooblockdelay = 1
 local togglebettercontroll = false
 local controllll = 1
 local toggleautobackstab = false
+local autobackstabtype = "Tween"
+local autolook = false
+local autobackstabtrigdist = 10
 local autobackstabdistance = 0.25
 local truepunch = false
 local moving = false
@@ -665,7 +669,7 @@ local shedtrigers = {
     ["rbxassetid://121781457295101"] = "CHICKEN",
 }
 
-local guesttrigers = {
+guesttrigers = {
     ["rbxassetid://87259391926321"] = "PUNCH",
     ["rbxassetid://106014898528300"] = "CHARGE",
     ["rbxassetid://72722244508749"] = "BLOCK",
@@ -678,9 +682,10 @@ local guesttrigers = {
 
 
 
-local succs, err = pcall(function()
+
 -- Functions:
 -- Download:
+task.spawn(function()
 local function GetAssetList()
 	local url = "https://api.github.com/repos/sigmaboy-sigma-boy/SigmasakenHubFileDownloader/git/trees/main?recursive=1"
 	local assetList = {}
@@ -2997,23 +3002,54 @@ end)
 
 -- Auto backstab:
 mainremote.OnClientEvent:Connect(function(action, ability)
-    if action ~= "UseActorAbility" or not toggleautobackstab then return end
-    if not tostring(buffer.tostring(ability[1]):sub(6)) == "Dagger" or lp.Character.Name ~= "TwoTime" then return end
+    if action ~= "UseActorAbility" then return end
+    if tostring(buffer.tostring(ability[1]):sub(6)) ~= "Dagger" or lp.Character.Name ~= "TwoTime" then return end
 
     local hrp = lp.Character:FindFirstChild("HumanoidRootPart")
     local killerhrp = currentkiller:FindFirstChild("HumanoidRootPart")
-    if not hrp or not killerhrp then return end
+
+    task.spawn(function()
+        if autolook then
+            hrp.CFrame = CFrame.lookAt(
+                hrp.Position, 
+                hrp.Position + Vector3.new(killerhrp.CFrame.LookVector.X, 0, killerhrp.CFrame.LookVector.Z).Unit)
+        end
+    end)
+
+    if not hrp or not killerhrp or not toggleautobackstab then return end
+    if (killerhrp.Position - hrp.Position).Magnitude > autobackstabtrigdist then return end
 
     local start = tick()
     local conn
 
-    conn = run.RenderStepped:Connect(function()
-        if tick() - start > 1 then
-            conn:Disconnect()
-        end
+    --autobackstabtrigdist
+    --"Tween", "Teleport 1 Time", "Teleport until ability end","Hitbox Drag"
+    --autobackstabtype
 
+    --[[if autobackstabtype == "Teleport until ability end" then
+        conn = run.RenderStepped:Connect(function()
+            if tick() - start > 0.6 then
+                conn:Disconnect()
+            end
+
+            hrp.CFrame = killerhrp.CFrame * CFrame.new(0, 0, tonumber(autobackstabdistance))
+        end)
+    else]]if autobackstabtype == "Teleport" then
         hrp.CFrame = killerhrp.CFrame * CFrame.new(0, 0, tonumber(autobackstabdistance))
-    end)
+    elseif autobackstabtype == "Tween" then
+        local tween = twin:Create(hrp, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), 
+        {CFrame = killerhrp.CFrame * CFrame.new(0, 0, tonumber(autobackstabdistance))})
+        tween:Play()
+    elseif autobackstabtype == "Hitbox Drag" then
+        conn = run.Heartbeat:Connect(function()
+            if tick() - start > 0.8 then
+                conn:Disconnect()
+            end
+
+            lp.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(killerhrp.CFrame * CFrame.new(0, 0, tonumber(autobackstabdistance)), lp.Character.HumanoidRootPart.AssemblyLinearVelocity))
+        end)
+    end
 end)
 
 -- Hitbox expander:
@@ -5907,9 +5943,79 @@ CombatTab:CreateSlider({
         end
 })
 
-CombatTab:CreateSection("Other")
+CombatTab:CreateSection("TwoTime Auto-backstab")
 
-CombatTab:CreateLabel("Auto backstab is very blatant, it teleports you straight behind the killer. Use at your own discretion.", "circle-alert")
+CombatTab:CreateToggle({
+    Name = "Auto look direction what killer faces",
+    Flag = "ToggleAutoLook",
+    CurrentValue = false,
+        Callback = function(Value)
+            autolook = Value
+        end
+})
+
+CombatTab:CreateToggle({
+    Name = "Auto backstab killer",
+    Flag = "ToggleAutoBackstab",
+    CurrentValue = false,
+        Callback = function(Value)
+            toggleautobackstab = Value
+        end
+})
+
+local suc, err = pcall(function()
+    local mousemodule = require(rs.Systems.Player.Miscellaneous.GetPlayerMousePosition)
+end)
+
+if suc then
+    CombatTab:CreateDropdown({
+        Name = "Auto backstab type",
+        Flag = "AutoBackstabType",
+        Options = {"Tween", "Teleport","Hitbox Drag"},
+        CurrentOption = {"Tween"},
+        MultipleOptions = false,
+            Callback = function(Options)
+                autobackstabtype = Options[1]
+            end
+    })
+else
+    CombatTab:CreateDropdown({
+        Name = "Auto backstab type (ur shitsploit doesnt support hitbox drag)",
+        Flag = "AutoBackstabType",
+        Options = {"Tween", "Teleport"},
+        CurrentOption = {"Tween"},
+        MultipleOptions = false,
+            Callback = function(Options)
+                autobackstabtype = Options[1]
+            end
+    })
+end
+
+CombatTab:CreateSlider({
+	Name = "Distance between you and killer",
+	Range = {1, 5},
+    Suffix = "Studs",
+	Increment = 0.05,
+    Flag = "AutoBackstabDistance",
+	CurrentValue = 1.25,
+    	Callback = function(Value)
+            autobackstabdistance = Value
+    	end
+})
+
+CombatTab:CreateSlider({
+	Name = "Auto backstab triger distance",
+	Range = {10, 250},
+    Suffix = "Studs",
+	Increment = 5,
+    Flag = "AutoBackstabTrigerDistance",
+	CurrentValue = 10,
+    	Callback = function(Value)
+            autobackstabtrigdist = Value
+    	end
+})
+
+CombatTab:CreateSection("Other")
 
 CombatTab:CreateToggle({
     Name = "Toggle void rush, charge, walkspeed override control",
@@ -5927,27 +6033,6 @@ CombatTab:CreateToggle({
         Callback = function(Value)
             truepunch = Value
         end
-})
-
-CombatTab:CreateToggle({
-    Name = "Auto backstab killer",
-    Flag = "ToggleAutoBackstab",
-    CurrentValue = false,
-        Callback = function(Value)
-            toggleautobackstab = Value
-        end
-})
-
-CombatTab:CreateSlider({
-	Name = "Distance between you and killer",
-	Range = {1, 5},
-    Suffix = "Studs",
-	Increment = 0.05,
-    Flag = "AutoBackstabDistance",
-	CurrentValue = 1.25,
-    	Callback = function(Value)
-            autobackstabdistance = Value
-    	end
 })
 
 CombatTab:CreateSlider({
@@ -7044,10 +7129,9 @@ tts:Message("Welcome to Sigmasaken. If you are seeing this message, all assets h
 --CustomLMSDrop:Refresh(LMSAssets)
 --CustomLobbyDrop:Refresh(LobbyAssets)
 end)
+end)
 
-if not succs then
-	error(err)
-end
+
 --[[
 task.spawn(function()
 	local args = {
