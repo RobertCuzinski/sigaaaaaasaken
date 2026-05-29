@@ -6110,7 +6110,7 @@ if suc then
 	end)
 
 	CombatTab:CreateToggle({
-		Name = "Hitbox expander v2 (shitier than v1, legiter than v1, slows u down a little if you moving)",
+		Name = "Hitbox expander v2",
 		Flag = "ToggleJasonsHitboxv2",
 		CurrentValue = false,
 			Callback = function(Value)
@@ -6119,7 +6119,7 @@ if suc then
 	})
 
 	CombatTab:CreateToggle({
-		Name = "Hitbox expander v3 (shit, very balant, cant hit long rage target, possibly detected by AC)",
+		Name = "Hitbox expander v3",
 		Flag = "ToggleJasonsHitboxv3",
 		CurrentValue = false,
 			Callback = function(Value)
@@ -7133,5 +7133,4 @@ task.spawn(function()
 	game:GetService("ReplicatedStorage"):WaitForChild("Modules", 10):WaitForChild("Network", 10):WaitForChild("Network", 10):WaitForChild("RemoteEvent", 10):FireServer(unpack(args))
 end)
 ]]
-
 
