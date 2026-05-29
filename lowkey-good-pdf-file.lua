@@ -1,15 +1,14 @@
-task.spawn(function()
 if not isfolder("TheSigmaHub") then
     makefolder("TheSigmaHub")
 end
 
+--local RequireDebug = loadstring(game:HttpGet("https://raw.githubusercontent.com/sigmaboy-sigma-boy/SigmaSakenHubFileDownloader/refs/heads/main/SigmasakenAsset/Extra/.luau"))()
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local scriptversion = "v1.0.3"
-local updateperiod = "27/05/2026"
+local scriptversion = "v1.0.3 [reverted changes]"
+local updateperiod = "29/05/26"
 
 local Window = Rayfield:CreateWindow({
-    Name = "Sigmasaken",
     Name = "Sigmasaken " .. scriptversion,
     ScriptID = "sid_39jm3r1n1ocq",
     Icon = "sigma",
@@ -74,15 +73,15 @@ local Window = Rayfield:CreateWindow({
         RememberJoins = true
     },
 
-    KeySystem = false, -- dont enable, i was doing some demo work
+    KeySystem = false,
     KeySettings = {
-        Title = "Sigmasaken",
-        Subtitle = "hashed",
-        Note = "-",
-        FileName = "c2lnbWFzYWtlbmtleXRlcm1zb2ZzZXJ2aWNl",
+        Title = "Key System",
+        Subtitle = "t",
+        Note = "pee",
+        FileName = "Key",
         SaveKey = true,
         GrabKeyFromSite = false,
-        Key = {"0"}
+        Key = {"sigmerskensigmasigmaboy_higuest"}
     }
 })
 
@@ -132,16 +131,6 @@ elseif not uis.TouchEnabled and uis.KeyboardEnabled and uis.MouseEnabled then
 	tts:Message("Computer device")
 end
 
--- tabs
-local ESPTab = Window:CreateTab("ESP", 89705354952445)
-local StaminaTab = Window:CreateTab("Stamina", 131988134488629)
-local MiscTab = Window:CreateTab("Misc", 125961818116791)
-local CombatTab = Window:CreateTab("Combat", 100914317336916)
-local AudioTab = Window:CreateTab("Music", 74530234897361)
-local FunTab = Window:CreateTab("Fun", 70414744064346)
-local GeneratorTab = Window:CreateTab("Objectives", 93079123429781)
-local SettingsTab = Window:CreateTab("Settings", 102842005215871)
-
 local rgdl = game.workspace:FindFirstChild("Ragdolls")
 local ingamefolder = workspace.Map.Ingame
 local Sprinting = game:GetService("ReplicatedStorage").Systems.Character.Game.Sprinting
@@ -182,7 +171,6 @@ local flipcoin = false
 local charges = 2
 local toggleinkognito = true
 local device = "Disable"
-local curdevice = ""
 local changingdevice = false
 local dusekprotection = false
 local makepizzabigger = false
@@ -192,7 +180,6 @@ local disableslowness = false
 local disablefovmodf = false
 local deletejohntoespikes = false
 local disableblind = false
-local disableragdoll = false
 local togglenoclip = false
 
 local hitboxsize = 18
@@ -669,7 +656,7 @@ local shedtrigers = {
     ["rbxassetid://121781457295101"] = "CHICKEN",
 }
 
-guesttrigers = {
+local guesttrigers = {
     ["rbxassetid://87259391926321"] = "PUNCH",
     ["rbxassetid://106014898528300"] = "CHARGE",
     ["rbxassetid://72722244508749"] = "BLOCK",
@@ -682,10 +669,9 @@ guesttrigers = {
 
 
 
-
+local succs, err = pcall(function()
 -- Functions:
 -- Download:
-task.spawn(function()
 local function GetAssetList()
 	local url = "https://api.github.com/repos/sigmaboy-sigma-boy/SigmasakenHubFileDownloader/git/trees/main?recursive=1"
 	local assetList = {}
@@ -2210,13 +2196,12 @@ local function NameProtect(state)
 end
 
 local function startchangedevice()
-    while task.wait(1) do
-        if device == "Disable" or curdevice == device then continue end
+    while task.wait(0.5) do
+        if device == "Disable" then continue end
 
         mainremote:FireServer("SetDevice", {
             [1] = tostring(device)
         })
-        curdevice = device
     end
 end
 
@@ -4728,10 +4713,10 @@ if sucm then
 		
 		if self == lp and method:lower() == "kick" then
 			Rayfield:Notify({
-				Title = "Provocation",
-				Content = "Prevented player from being kicked.",
+				Title = "Kick attempt",
+				Content = "Somthing tried to kick u on client side",
 				Duration = 5,
-				Image = 138417041008247,
+				Image = "triangle-alert",
 			})
 			return
 		end
@@ -4742,10 +4727,10 @@ if sucm then
 	setreadonly(gm, true)
 else
 	Rayfield:Notify({
-		Title = "Blockage",
-		Content = "Your environment does not support metatables. Anti-kick failed to run.",
+		Title = "Can run anti-kick!",
+		Content = "Ur shitsploit doesnt support metatables, please change ur executor",
 		Duration = 5,
-		Image = 135861164604280,
+		Image = "triangle-alert",
 	})
 end
 
@@ -4790,10 +4775,10 @@ local function Start()
         counter.Visible = true
 
         Rayfield:Notify({ 
-            Title = "Applied",
-            Content = "A temporary fix has been applied for the in-game UI.",
+            Title = "Success!",
+            Content = "Successfully fixed player info.",
             Duration = 5,
-            Image = 85420102865439,
+            Image = "circle-check"
         })
     end
 end
@@ -4829,6 +4814,7 @@ end)
 
 
 
+local ESPTab = Window:CreateTab("ESP", "eye")
 
 ESPTab:CreateToggle({
 	Name = "Toggle ESP",
@@ -4840,7 +4826,7 @@ ESPTab:CreateToggle({
 })
 
 ESPTab:CreateToggle({
-	Name = "Toggle ESP Billboards",
+	Name = "Toggle ESP billboards",
 	Flag = "ToggleBBESP",
 	CurrentValue = false,
     	Callback = function(Value)
@@ -4849,7 +4835,7 @@ ESPTab:CreateToggle({
 })
 
 ESPTab:CreateSlider({
-	Name = "ESP Transparency",
+	Name = "ESP transparency",
 	Range = {0, 1},
 	Increment = 0.05,
     Suffix = "",
@@ -4910,10 +4896,10 @@ ESPTab:CreateSlider({
 
 ESPTab:CreateDivider()
 
-ESPTab:CreateLabel("Turning on 2 or more toggles can cause the ESP to bug out.", 101507134037495)
+ESPTab:CreateLabel("Turning on 2 or more toggles can cause the ESP to bug out.", "circle-alert")
 
 ESPTab:CreateToggle({
-	Name = "Toggle Minion ESP",
+	Name = "Toggle minions ESP",
 	Flag = "ToggleMinionsESP",
 	CurrentValue = false,
     	Callback = function(Value)
@@ -4922,7 +4908,7 @@ ESPTab:CreateToggle({
 })
 
 ESPTab:CreateToggle({
-	Name = "Toggle Ritual ESP",
+	Name = "Toggle rituals ESP",
 	Flag = "ToggleRitualsESP",
 	CurrentValue = false,
     	Callback = function(Value)
@@ -4931,7 +4917,7 @@ ESPTab:CreateToggle({
 })
 
 ESPTab:CreateToggle({
-	Name = "Toggle Footprint ESP",
+	Name = "Toggle footprints ESP",
 	Flag = "ToggleFootsESP",
 	CurrentValue = false,
     	Callback = function(Value)
@@ -4942,7 +4928,7 @@ ESPTab:CreateToggle({
 ESPTab:CreateDivider()
 
 ESPTab:CreateColorPicker({
-	Name = "Killer ESP Color",
+	Name = "Killer ESP color",
 	Color = Color3.fromRGB(255, 0, 0),
 	Flag = "KillerESPColor",
 	Callback = function(Value)
@@ -4958,7 +4944,7 @@ ESPTab:CreateColorPicker({
 })
 
 ESPTab:CreateColorPicker({
-	Name = "Survivors ESP Color",
+	Name = "Survivors ESP color",
 	Color = Color3.fromRGB(0, 0, 255),
 	Flag = "SurvivorESPColor",
 	Callback = function(Value)
@@ -4974,7 +4960,7 @@ ESPTab:CreateColorPicker({
 })
 
 ESPTab:CreateColorPicker({
-	Name = "Items ESP Color",
+	Name = "Items ESP color",
 	Color = Color3.fromRGB(255, 255, 0),
 	Flag = "ItemsESPColor",
 	Callback = function(Value)
@@ -4990,7 +4976,7 @@ ESPTab:CreateColorPicker({
 })
 
 ESPTab:CreateColorPicker({
-	Name = "Generator ESP Color",
+	Name = "Generator ESP color",
 	Color = Color3.fromRGB(125, 0, 255),
 	Flag = "GeneratorESPColor",
 	Callback = function(Value)
@@ -5006,7 +4992,7 @@ ESPTab:CreateColorPicker({
 })
 
 ESPTab:CreateColorPicker({
-	Name = "Fake Generator ESP Color",
+	Name = "Fake generator ESP color",
 	Color = Color3.fromRGB(255, 0, 0),
 	Flag = "FakegeneratorESPColor",
 	Callback = function(Value)
@@ -5022,7 +5008,7 @@ ESPTab:CreateColorPicker({
 })
 
 ESPTab:CreateColorPicker({
-	Name = "Ritual ESP Color",
+	Name = "Ritual ESP color",
 	Color = Color3.fromRGB(255, 255, 255),
 	Flag = "RitualESPColor",
 	Callback = function(Value)
@@ -5038,7 +5024,7 @@ ESPTab:CreateColorPicker({
 })
 
 ESPTab:CreateColorPicker({
-	Name = "Minions ESP Color",
+	Name = "Minions ESP color",
 	Color = Color3.fromRGB(0, 255, 255),
 	Flag = "MinionsESPColor",
 	Callback = function(Value)
@@ -5054,7 +5040,7 @@ ESPTab:CreateColorPicker({
 })
 
 ESPTab:CreateColorPicker({
-	Name = "Footprints ESP Color",
+	Name = "Footprints ESP color",
 	Color = Color3.fromRGB(255, 125, 0),
 	Flag = "FootprintESPColor",
 	Callback = function(Value)
@@ -5069,20 +5055,19 @@ ESPTab:CreateColorPicker({
 	end
 })
 
-
-
+local StaminaTab = Window:CreateTab("Stamina", "person-standing")
 
 local suc, err = pcall(function()
     local stamina = require(Sprinting)
 end)
 
 if not suc then
-    StaminaTab:CreateLabel("Your environment doesn't support require.", 135861164604280)
+    StaminaTab:CreateLabel("Your executor does not support the require function. Switch to another, such as Madium - or if on mobile, Delta.", "circle-alert")
 else
     StaminaTab:CreateSection("Survivor stamina settings")
 
     local MaxSurvivorStamina = StaminaTab:CreateInput({
-        Name = "Max Stamina",
+        Name = "Max stamina",
         CurrentValue = "100",
         PlaceholderText = "Number",
         RemoveTextAfterFocusLost = false,
@@ -5093,7 +5078,7 @@ else
     })
 
     local MinSurvivorStamina = StaminaTab:CreateInput({
-        Name = "Min Stamina",
+        Name = "Min stamina",
         CurrentValue = "0",
         PlaceholderText = "Number",
         RemoveTextAfterFocusLost = false,
@@ -5104,7 +5089,7 @@ else
     })
 
     local SurvivorStaminaGain = StaminaTab:CreateInput({
-        Name = "Stamina Gain",
+        Name = "Stamina gain",
         CurrentValue = "20",
         PlaceholderText = "Number",
         RemoveTextAfterFocusLost = false,
@@ -5115,7 +5100,7 @@ else
     })
 
     local SurvivorStaminaLoss = StaminaTab:CreateInput({
-        Name = "Stamina Loss",
+        Name = "Stamina loss",
         CurrentValue = "10",
         PlaceholderText = "Number",
         RemoveTextAfterFocusLost = false,
@@ -5126,7 +5111,7 @@ else
     })
 
     local SurvivorSprintSpeed = StaminaTab:CreateInput({
-        Name = "Sprint Speed",
+        Name = "Sprint speed",
         Description = "survivor's sprint speed",
         PlaceholderText = "Number",
         CurrentValue = "26",
@@ -5139,7 +5124,7 @@ else
     })
 
     local SurvivorDisableStaminaDrain = StaminaTab:CreateToggle({
-        Name = "Disable Stamina Drain",
+        Name = "Disable stamina drain",
         Description = "disable stamina drain for killers/survivors",
 		Flag = "SurvivorDisableStaminaDrain",
         CurrentValue = false,
@@ -5150,10 +5135,10 @@ else
 
     StaminaTab:CreateSection("Killer stamina settings")
 
-    StaminaTab:CreateLabel("Some settings are shared with your Survivor settings.", 92417144944181)
+    StaminaTab:CreateLabel("Your killer min, dsd, gain and loss stamina settings will be shared with your survivor stamina settings.", "circle-check")
 
     local KillerSprintSpeed = StaminaTab:CreateInput({
-        Name = "Killer Sprint Speed",
+        Name = "Killer sprint Speed",
         PlaceholderText = "Number",
         CurrentValue = "28",
         Flag = "KillerSprintSpeed",
@@ -5163,7 +5148,7 @@ else
     })
 
     local KillerMaxStamina = StaminaTab:CreateInput({
-        Name = "Killer Max Stamina",
+        Name = "Killer max stamina",
         PlaceholderText = "Number",
         CurrentValue = "110",
         Flag = "KillerMaxStamina",
@@ -5175,7 +5160,7 @@ else
     StaminaTab:CreateSection("Recommended settings")
 
     StaminaTab:CreateButton({
-        Name = "Apply recommended settings",
+        Name = "Recommended settings",
         Callback = function()
             num1 = 100
             MaxSurvivorStamina:Set(100)
@@ -5202,19 +5187,19 @@ else
             KillerMaxStamina:Set(110)
 
             Rayfield:Notify({ 
-                Title = "Configuration",
-                Content = "Applied recommended settings successfully.",
+                Title = "Sigmasaken",
+                Content = "Successfully loaded settings.",
                 Duration = 3,
-                Image = 92828133304739
+                Image = "circle-check"
             })
         end,
     })
 end
 
-
-
-
+local MiscTab = Window:CreateTab("Misc", "circle-help")
 MiscTab:CreateSection("Invisibility")
+
+MiscTab:CreateLabel("Thankfully, no one else can see your collision hitbox anymore due to a past Forsaken patch.", "info")
 
 MiscTab:CreateToggle({
 	Name = "Toggle invisibility",
@@ -5307,7 +5292,7 @@ if suc then
 	end
 
 	MiscTab:CreateToggle({
-		Name = "Dusekkar Protection through Walls",
+		Name = "Dusekkar protection through walls",
 		Flag = "DusekkarProtectionThroughWalls",
 		CurrentValue = false,
 			Callback = function(Value)
@@ -5315,7 +5300,7 @@ if suc then
 			end
 	})
 else
-	MiscTab:CreateLabel("Your environment doesn't support require.", 135861164604280)
+	MiscTab:CreateLabel("Your executor doesnt support dusekkar protection through walls!", "circle-alert")
 end
 
 MiscTab:CreateSlider({
@@ -5331,7 +5316,7 @@ MiscTab:CreateSlider({
 })
 
 MiscTab:CreateSlider({
-	Name = "Custom Jumppower",
+	Name = "Custom jump power",
 	Range = {0, 150},
     Flag = "CustomJump",
 	Increment = 10,
@@ -5342,7 +5327,7 @@ MiscTab:CreateSlider({
 })
 
 MiscTab:CreateButton({
-	Name = "Loop Fullbright",
+	Name = "Loop fullbright",
     	Callback = function()
             if not fblooping then
                 fblooping = true
@@ -5378,7 +5363,7 @@ MiscTab:CreateDropdown({
         end
 })
 
-MiscTab:CreateLabel("Spoofing your device may cause certain keybinds to break, such as Veeronica's spray and Nosferatu's minigame.", 95387370402049)
+MiscTab:CreateLabel("Spoofing your device may cause certain keybinds to break, such as Veeronica's spray and Nosferatu's minigame.", "circle-alert")
 
 MiscTab:CreateSection("Auto coinflip")
 
@@ -5472,7 +5457,7 @@ MiscTab:CreateButton({
 MiscTab:CreateDivider()
 
 MiscTab:CreateToggle({
-	Name = "Enable Pizza hitbox resize",
+	Name = "Enable pizza hitbox resize",
 	Flag = "PizzaHitboxBigger",
 	CurrentValue = false,
     	Callback = function(Value)
@@ -5481,7 +5466,7 @@ MiscTab:CreateToggle({
 })
 
 MiscTab:CreateToggle({
-	Name = "Instantly eat Pizza",
+	Name = "Instantly eat pizza",
 	Flag = "InstantEatPizza",
 	CurrentValue = false,
     	Callback = function(Value)
@@ -5501,10 +5486,10 @@ MiscTab:CreateSlider({
     	end
 })
 
-MiscTab:CreateSection("Antis")
+MiscTab:CreateSection("Anti stuff")
 
 MiscTab:CreateToggle({
-	Name = "Disable Stun",
+	Name = "Disable stun",
 	Flag = "DisableStun",
 	CurrentValue = false,
     	Callback = function(Value)
@@ -5513,7 +5498,7 @@ MiscTab:CreateToggle({
 })
 
 MiscTab:CreateToggle({
-	Name = "Disable FOV Modifiers",
+	Name = "Disable FOV modifiers",
 	Flag = "DisableFovModifiers",
 	CurrentValue = false,
     	Callback = function(Value)
@@ -5522,7 +5507,7 @@ MiscTab:CreateToggle({
 })
 
 MiscTab:CreateToggle({
-	Name = "Disable Blur/Blindness",
+	Name = "Disable blindness",
 	Flag = "DisableBlindEffects",
 	CurrentValue = false,
     	Callback = function(Value)
@@ -5546,7 +5531,7 @@ MiscTab:CreateToggle({
 })
 
 MiscTab:CreateToggle({
-	Name = "Auto delete Corrupt Energy",
+	Name = "Auto delete Corrupt Energy (Spikes)",
 	Flag = "AutoDeleteJohnsSpikes",
 	CurrentValue = false,
     	Callback = function(Value)
@@ -5554,8 +5539,7 @@ MiscTab:CreateToggle({
     	end
 })
 
-
-
+local CombatTab = Window:CreateTab("Combat", "angry")
 
 CombatTab:CreateSection("Library")
 
@@ -5573,7 +5557,7 @@ if suc then
 			end
 	})
 else
-	CombatTab:CreateLabel("Your environment doesn't support require.", 135861164604280)
+	CombatTab:CreateLabel("Your executor doesnt support instant jane doe crystal charge!", "circle-alert")
 end
 
 CombatTab:CreateToggle({
@@ -5615,7 +5599,7 @@ end)
 
 CombatTab:CreateSection("Custom Veeronica's config")
 
-CombatTab:CreateLabel("Do not use Auto Trick on mobile. Mobile does not support VIS.", 95387370402049)
+CombatTab:CreateLabel("Do not use Auto Trick on mobile. It uses VirtualInputService, meaning it'll break your controls temporarily.", "circle-alert")
 
 if suc then
 	CombatTab:CreateToggle({
@@ -6052,7 +6036,7 @@ CombatTab:CreateSection("Hitbox Expander")
 CombatTab:CreateLabel("If you want to look more legitimate, set the distance to 10.", "circle-help", Color3.fromRGB(120, 120, 120), true)
 --[[
 CombatTab:CreateToggle({
-    Name = "Hitbox Expander V1 (Patched)",
+    Name = "Hitbox expander v1 (works good only for killers)",
     Flag = "ToggleJasonsHitbox",
     CurrentValue = false,
         Callback = function(Value)
@@ -6063,14 +6047,14 @@ CombatTab:CreateToggle({
 if suc then
 	run.Heartbeat:Connect(function()
 		if target and jh3 and not jh2 and not jh and not bjh and 
-        (target.Position - lp.Character.HumanoidRootPart.Position).Magnitude <= hdist then
+        (target.Position - lp.Character.HumanoidRootPart.Position).Magnitude >= hdist then
 			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, (target.Position - lp.Character.HumanoidRootPart.Position) / 10))
 			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, (target.Position - (lp.Character.HumanoidRootPart.Position) / 10) * 2))
 			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, (target.Position - (lp.Character.HumanoidRootPart.Position) / 10) * 3))
 			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, (target.Position - (lp.Character.HumanoidRootPart.Position) / 10) * 4))
 			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, (target.Position - (lp.Character.HumanoidRootPart.Position) / 10) * 5))
 		elseif target and not jh3 and jh2 and not jh and not bjh and 
-        (target.Position - lp.Character.HumanoidRootPart.Position).Magnitude <= hdist then
+        (target.Position - lp.Character.HumanoidRootPart.Position).Magnitude >= hdist then
 			lp.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
 			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, lp.Character.HumanoidRootPart.AssemblyLinearVelocity))
 		end
@@ -6126,7 +6110,7 @@ if suc then
 	end)
 
 	CombatTab:CreateToggle({
-		Name = "Hitbox Expander V2 (Closet)",
+		Name = "Hitbox expander v2 (shitier than v1, legiter than v1, slows u down a little if you moving)",
 		Flag = "ToggleJasonsHitboxv2",
 		CurrentValue = false,
 			Callback = function(Value)
@@ -6135,7 +6119,7 @@ if suc then
 	})
 
 	CombatTab:CreateToggle({
-		Name = "Hitbox Expander V3 (Blatant)",
+		Name = "Hitbox expander v3 (shit, very balant, cant hit long rage target, possibly detected by AC)",
 		Flag = "ToggleJasonsHitboxv3",
 		CurrentValue = false,
 			Callback = function(Value)
@@ -6143,12 +6127,12 @@ if suc then
 			end
 	})
 else
-	CombatTab:CreateLabel("Your environment doesn't support require.", 135861164604280)
-	CombatTab:CreateLabel("Your environment doesn't support require.", 135861164604280)
+	CombatTab:CreateLabel("Your executor doesnt support hitbox expander V2!", "circle-alert")
+	CombatTab:CreateLabel("Your executor doesnt support hitbox expander V3!", "circle-alert")
 end
 
 CombatTab:CreateToggle({
-    Name = "Basic Hitbox Expander (Closet)",
+    Name = "Hitbox expander (Closet)",
     Flag = "ToggleBetterHitbox",
     CurrentValue = false,
         Callback = function(Value)
@@ -6157,7 +6141,7 @@ CombatTab:CreateToggle({
 })
 
 CombatTab:CreateSlider({
-	Name = "Hitbox Distance",
+	Name = "Hitbox distance",
 	Range = {10, 500},
     Suffix = "Studs",
     Flag = "HitboxDistance",
@@ -6170,7 +6154,7 @@ CombatTab:CreateSlider({
 
 CombatTab:CreateSection("Fake Block")
 
-CombatTab:CreateLabel("Fake block may be broken on mobile, especially with the topbar buttons.", 95387370402049)
+CombatTab:CreateLabel("Fake block may be broken on mobile, especially with the topbar buttons. It will be fixed later.", "info")
 
 CombatTab:CreateToggle({
     Name = "Toggle fake block",
@@ -6213,8 +6197,7 @@ CombatTab:CreateDropdown({
         end
 })
 
-
-
+local AudioTab = Window:CreateTab("Music", "music")
 
 AudioTab:CreateSection("Custom In-Game Music")
 
@@ -6460,9 +6443,7 @@ AudioTab:CreateParagraph({
     ]]
 })
 
-
-
-
+local FunTab = Window:CreateTab("Fun", "party-popper")
 
 FunTab:CreateSection("Custom Animations & Emotes")
 
@@ -6774,12 +6755,10 @@ if suc then
             end
     })
 else
-	FunTab:CreateLabel("Your environment doesn't support hooking.", 135861164604280)
+	FunTab:CreateLabel("Your executor doesnt support the functions needed to use ragdoll configs!", "circle-alert")
 end
 
-
-
-
+local GeneratorTab = Window:CreateTab("Generators", "cog")
 
 GeneratorTab:CreateToggle({
 	Name = "Toggle auto-generator",
@@ -6800,7 +6779,7 @@ GeneratorTab:CreateToggle({
 })
 
 GeneratorTab:CreateKeybind({
-    Name = "Complete Puzzle Keybind",
+    Name = "Generator",
     Flag = "GeneratorTaskKeyBind",
     CurrentKeybind = "Z",
     HoldToInteract = false,
@@ -6844,7 +6823,7 @@ GeneratorTab:CreateSlider({
 GeneratorTab:CreateSection("Generator image")
 
 local gendrop = GeneratorTab:CreateDropdown({
-   Name = "Generator Background",
+   Name = "Generator image",
    Options = {},
    CurrentOption = {},
    MultipleOptions = false,
@@ -6854,9 +6833,7 @@ local gendrop = GeneratorTab:CreateDropdown({
    end,
 })
 
-
-
-
+local SettingsTab = Window:CreateTab("Settings", "settings")
 
 SettingsTab:CreateToggle({
 	Name = "Mobile fake block button",
@@ -6954,21 +6931,23 @@ SettingsTab:CreateToggle({
 
 SettingsTab:CreateDivider()
 
-SettingsTab:CreateLabel("Discord Invite: discord.gg/fBjUx54cbd", 108404754717290)
+SettingsTab:CreateLabel("discord.gg/fBjUx54cbd", 73132811772878)
 SettingsTab:CreateButton({
    Name = "Copy to Clipboard",
    Callback = function()
        if setclipboard then
            setclipboard("https://discord.gg/fBjUx54cbd")
        else
-           tts:Message("holy shitsploit")
+           tts:Message("shitsploit")
        end
    end,
 })
 
 SettingsTab:CreateDivider()
 
-SettingsTab:CreateLabel("Made by with love by @guest.iv and @bhopboss", 130667117695899, Color3.fromRGB(194, 128, 183), true)
+SettingsTab:CreateLabel("Made by @guest.iv and @bhopboss", "wrench")
+SettingsTab:CreateLabel("Script version: " .. scriptversion, "scroll")
+SettingsTab:CreateLabel("Last updated: " .. updateperiod .. ", 10:09PM", "book-text") -- manual
 
 --[[
 local ChatTab
@@ -7112,10 +7091,10 @@ Rayfield:Notify({
 
 if lp.Character.Parent.Name == "Killers" or lp.Character.Parent.Name == "Survivors" then
 	Rayfield:Notify({ 
-		Title = "Console",
+		Title = "Warning!",
 		Content = "Looks like you loaded the script while being in a match, some functions might not work in this round.",
 		Duration = 3,
-		Image = 96248153479670
+		Image = "circle-alert"
 	})
 end
 
@@ -7129,9 +7108,10 @@ tts:Message("Welcome to Sigmasaken. If you are seeing this message, all assets h
 --CustomLMSDrop:Refresh(LMSAssets)
 --CustomLobbyDrop:Refresh(LobbyAssets)
 end)
-end)
 
-
+if not succs then
+	print(err)
+end
 --[[
 task.spawn(function()
 	local args = {
