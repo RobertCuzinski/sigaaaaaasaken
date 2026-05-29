@@ -5,7 +5,7 @@ end
 --local RequireDebug = loadstring(game:HttpGet("https://raw.githubusercontent.com/sigmaboy-sigma-boy/SigmaSakenHubFileDownloader/refs/heads/main/SigmasakenAsset/Extra/.luau"))()
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local scriptversion = "v1.0.3 [reverted changes]"
+local scriptversion = "v1.0.3"
 local updateperiod = "29/05/26"
 
 local Window = Rayfield:CreateWindow({
