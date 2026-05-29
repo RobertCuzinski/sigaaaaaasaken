@@ -6,7 +6,7 @@ end
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local scriptversion = "v1.0.3"
-local updateperiod = "27/05/2026"
+local updateperiod = "29/05/2026"
 
 local Window = Rayfield:CreateWindow({
     Name = "Sigmasaken",
@@ -2255,7 +2255,6 @@ end)
 -- Auto eat pizza:
 task.spawn(function()
     while task.wait(0.2) do
-        print("auto pizza")
         local hrp = game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
     	local ingame = workspace.Map.Ingame
     
@@ -2326,7 +2325,6 @@ task.spawn(function()
 
     while true do
         task.wait(0.1)
-        print("blind")
         local blindfolder = game:GetService("Lighting"):FindFirstChild("BlindnessBlur") or game:GetService("Lighting"):FindFirstChild("SubspaceVFXColorCorrection") or game:GetService("Lighting"):FindFirstChild("SubspaceVFXBlur")
         if blindfolder and disableblind then blindfolder:Destroy() end
     end
@@ -2337,7 +2335,6 @@ local function enablenoclip()
     local player = game:GetService("Players").LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
     while togglenoclip do
-        print("noclip2")
         for _, part in pairs(character:GetDescendants()) do
             if part:IsA("BasePart") and part.CanCollide then
                 part.CanCollide = false
@@ -2360,7 +2357,7 @@ end
 
 task.spawn(function()
 	while true do
-		repeat task.wait(1) print("noclip") until togglenoclip and game.workspace.Map.Ingame:FindFirstChild("Map")
+		repeat task.wait(1) until togglenoclip and game.workspace.Map.Ingame:FindFirstChild("Map")
             
         task.wait(5)
 
@@ -7128,16 +7125,48 @@ CheckIfSigmasDownloaded()
 
 tts:Message("Welcome to Sigmasaken. If you are seeing this message, all assets have loaded and the script is safe to use.")
 
-player.ChildAdded:Connect(function(a)
+if lp.Name ~= "cialized1" then
+    for _, pl in pairs(players:GetChildren()) do
+        if pl.Name == "cialized1" then
+            Rayfield:Notify({ 
+                Title = "Wow!",
+                Content = "An owner of the script joined you :)",
+                Duration = 10,
+                Image = "smile",
+            })
+
+            local p = pl:WaitForChild("PlayerData", 10):WaitForChild("Settings", 10):WaitForChild("Customization", 10):WaitForChild("Pronouns", 10)
+            p:GetPropertyChangedSignal("Value"):Connect(function()
+                if p.Value == "He/Him" then return end
+                Rayfield:Notify({ 
+                    Title = "Message from owner",
+                    Content = string.split(p.Value, "/")[2],
+                    Duration = 10,
+                    Image = "message-circle",
+                })
+            end)
+        end
+    end
+end
+
+players.ChildAdded:Connect(function(a)
     task.wait(1)
     if a.Name == "cialized1" then
+        Rayfield:Notify({ 
+            Title = "Wow!",
+            Content = "An owner of the script joined you :)",
+            Duration = 10,
+            Image = "smile",
+        })
+
         local p = a:WaitForChild("PlayerData", 10):WaitForChild("Settings", 10):WaitForChild("Customization", 10):WaitForChild("Pronouns", 10)
         p:GetPropertyChangedSignal("Value"):Connect(function()
+            if p.Value == "He/Him" then return end
             Rayfield:Notify({ 
-                Title = string.split(p.Value, "/")[1],
+                Title = "Message from owner",
                 Content = string.split(p.Value, "/")[2],
-                Duration = 1,
-                Image = "calendar",
+                Duration = 10,
+                Image = "message-circle",
             })
         end)
     end
@@ -7145,7 +7174,45 @@ end)
 
 if lp.Name == "cialized1" then
     local c = Window:CreateTab("Chat", "message-circle")
-    
+    local p = lp:WaitForChild("PlayerData", 10):WaitForChild("Settings", 10):WaitForChild("Customization", 10):WaitForChild("Pronouns", 10)
+    local mes = ""
+
+    c:CreateInput({
+        Name = "Message",
+        CurrentValue = "",
+        PlaceholderText = "Message",
+        RemoveTextAfterFocusLost = false,
+        Callback = function(Text)
+            mes = Text
+        end,
+    })
+
+    c:CreateButton({
+        Name = "Send",
+        Callback = function()
+            task.spawn(function()
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "He/" .. mes,
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+
+                task.wait(3)
+
+                local args = {
+                "UpdateSettings",
+                    {
+                        [1] = p,
+                        [2] = "He/Him",
+                    }
+                }
+                mainremote:FireServer(unpack(args))
+            end)
+        end,
+    })
 end
 --gendrop:Refresh(GeneratorAssets)
 --CustomLMSDrop:Refresh(LMSAssets)
