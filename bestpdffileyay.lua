@@ -11,10 +11,10 @@ local lp = players.LocalPlayer
 local playergui = lp.PlayerGui
 local mainremote = rs.Modules.Network.Network.RemoteEvent
 
-getgenv().TotalEXP = getgenv().TotalEXP or 0
-getgenv().TotalMoney = getgenv().TotalMoney or 0
-getgenv().TotalTasks = getgenv().TotalTasks or 0
-getgenv().StartedAutofarm = getgenv().StartedAutofarm or tick()
+_G.TotalEXP = _G.TotalEXP or 0
+_G.TotalMoney = _G.TotalMoney or 0
+_G.TotalTasks = _G.TotalTasks or 0
+_G.StartedAutofarm = _G.StartedAutofarm or tick()
 local gainedexp = 0
 local gainedmoney = 0
 local dealedtasks = 0
@@ -22,7 +22,7 @@ local dealedtasks = 0
 local kill = workspace.Players.Killers
 local surv = workspace.Players.Survivors
 
-local scriptdebug = getgenv().DebugEnabled or false --true
+local scriptdebug = _G.DebugEnabled or false --true
 local gencooldown = nil
 local going = false
 local toggledesync = false
@@ -69,20 +69,20 @@ playergui.Notis.ChildAdded:Connect(function(notif)
     if notif.Name == "ProductPurchaseNotif" and notif:IsA("TextLabel") then
         --if scriptdebug then print("[DEBUG]: Notification added") end
         if notif.Text:find("$5") then
-            getgenv().TotalMoney += 5
+            _G.TotalMoney += 5
             gainedmoney += 5
         end
         if notif.Text:find("15 EXP") then
-            getgenv().TotalEXP += 15
+            _G.TotalEXP += 15
             gainedexp += 15
         end
 
         if notif.Text:find("$5 & 15 EXP") then
-            getgenv().TotalTasks += 1
+            _G.TotalTasks += 1
             dealedtasks += 1
         end
 
-        if scriptdebug then print("[DEBUG]: Total money: $" .. getgenv().TotalMoney .. ", Total EXP: " .. getgenv().TotalEXP) end
+        if scriptdebug then print("[DEBUG]: Total money: $" .. _G.TotalMoney .. ", Total EXP: " .. _G.TotalEXP) end
     else
         if scriptdebug then print("[DEBUG]: Unknown notification added") end
     end
@@ -259,22 +259,22 @@ local function send(isnormal, data)
             ["fields"] = {
                 {
                     ["name"] = "EXP:",
-                    ["value"] = [[Total EXP gained: ]] .. getgenv().TotalEXP .. [[ 
+                    ["value"] = [[Total EXP gained: ]] .. _G.TotalEXP .. [[ 
                     EXP gained this time: ]] .. gainedexp,
                     ["inline"] = false
                 },
                 {
                     ["name"] = "Money:",
-                    ["value"] = [[Total money gained: $]] .. getgenv().TotalMoney .. [[ 
+                    ["value"] = [[Total money gained: $]] .. _G.TotalMoney .. [[ 
                     Money gained this time: ]] .. gainedmoney .. [[ 
                     You have $]] .. lp.PlayerData.Stats.Currency.Money.Value .. [[ money now.]],
                     ["inline"] = false
                 },
                 {
                     ["name"] = "Other:",
-                    ["value"] = [[Total time of auto-farm: ]] .. math.round(tick() - getgenv().StartedAutofarm) .. [[ 
+                    ["value"] = [[Total time of auto-farm: ]] .. math.round(tick() - _G.StartedAutofarm) .. [[ 
                     Time spent on this round: ]] .. data.time .. [[ 
-                    Total tasks: ]] .. getgenv().TotalTasks .. [[ 
+                    Total tasks: ]] .. _G.TotalTasks .. [[ 
                     Tasks made this round: ]] .. dealedtasks .. [[]],
                     ["inline"] = false
                 },
@@ -315,15 +315,15 @@ local function send(isnormal, data)
 end
 
 local function serverhop()
-	queueonteleport([[
-        getgenv().TotalEXP = ]] .. getgenv().TotalEXP .. [[
-        getgenv().TotalMoney = ]] .. getgenv().TotalMoney .. [[
-        getgenv().TotalTasks = ]] .. getgenv().TotalTasks .. [[
-        getgenv().StartedAutofarm = ]] .. getgenv().StartedAutofarm .. [[
+    queueonteleport([[
+        _G.TotalEXP = ]] .. _G.TotalEXP .. [[
+        _G.TotalMoney = ]] .. _G.TotalMoney .. [[
+        _G.TotalTasks = ]] .. _G.TotalTasks .. [[
+        _G.StartedAutofarm = ]] .. _G.StartedAutofarm .. [[
 
         loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/b81868b59ff466417e341a6f791bde9d6138c0f832cab2dba21c6de70cee5310/download"))()
     ]])
-	
+
     task.spawn(function()
         local PlaceID = game.PlaceId
         local AllIDs = {}
