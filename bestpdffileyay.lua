@@ -318,10 +318,12 @@ end
 
 local function serverhop()
     queueonteleport([[
-        _G.TotalEXP = ]] .. _G.TotalEXP .. [[
-        _G.TotalMoney = ]] .. _G.TotalMoney .. [[
-        _G.TotalTasks = ]] .. _G.TotalTasks .. [[
-        _G.StartedAutofarm = ]] .. _G.StartedAutofarm .. [[
+        _G.TotalEXP = ]] .. _G.TotalEXP or 0 .. [[ 
+        _G.TotalMoney = ]] .. _G.TotalMoney or 0 .. [[ 
+        _G.TotalTasks = ]] .. _G.TotalTasks or 0 .. [[ 
+        _G.StartedAutofarm = ]] .. _G.StartedAutofarm or tick() .. [[ 
+
+		_G.settings = ]] .. getgenv().settings .. [[ 
 
         loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/b81868b59ff466417e341a6f791bde9d6138c0f832cab2dba21c6de70cee5310/download"))()
     ]])
