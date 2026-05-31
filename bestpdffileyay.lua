@@ -1,3 +1,5 @@
+getgenv().settings = _G.settings
+
 if not getgenv().settings then error("[Auto-Fram]: No settings are provided") return end
 
 local players = game:GetService("Players")
