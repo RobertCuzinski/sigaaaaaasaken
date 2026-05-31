@@ -1074,6 +1074,8 @@ local function startautofarm(map)
             toggledesync = true
             if scriptdebug then print("[DEBUG]: Turned on desync") end
 
+			task.wait(0.2)
+
             if a.Desync.DesyncInVoid then
                 hrp.CFrame = lastframe
                 if scriptdebug then print("[DEBUG]: Teleported back") end
