@@ -1,4 +1,5 @@
-repeat task.wait() until game:IsLoaded()
+print("started waiting")
+game.Loaded:Wait(40)
 
 getgenv().settings = _G.settings
 
@@ -320,6 +321,8 @@ end
 
 local function serverhop()
     queueonteleport([[
+		game.Loaded:Wait(40)
+		
         _G.TotalEXP = ]] .. _G.TotalEXP or 0 .. [[ 
         _G.TotalMoney = ]] .. _G.TotalMoney or 0 .. [[ 
         _G.TotalTasks = ]] .. _G.TotalTasks or 0 .. [[ 
