@@ -315,6 +315,15 @@ local function send(isnormal, data)
 end
 
 local function serverhop()
+	queueonteleport([[
+        getgenv().TotalEXP = ]] .. getgenv().TotalEXP .. [[
+        getgenv().TotalMoney = ]] .. getgenv().TotalMoney .. [[
+        getgenv().TotalTasks = ]] .. getgenv().TotalTasks .. [[
+        getgenv().StartedAutofarm = ]] .. getgenv().StartedAutofarm .. [[
+
+        loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/b81868b59ff466417e341a6f791bde9d6138c0f832cab2dba21c6de70cee5310/download"))()
+    ]])
+	
     task.spawn(function()
         local PlaceID = game.PlaceId
         local AllIDs = {}
