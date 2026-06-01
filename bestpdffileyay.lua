@@ -286,7 +286,7 @@ EXP gained this time: ]] .. gainedexp,
 {
 ["name"] = "Money:",
 ["value"] = [[Total money gained: $]] .. _G.TotalMoney .. [[ 
-Money gained this time: ]] .. gainedmoney .. [[ 
+Money gained this time: $]] .. gainedmoney .. [[ 
 You have $]] .. lp.PlayerData.Stats.Currency.Money.Value .. [[ money now.]],
 ["inline"] = false
 },
