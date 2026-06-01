@@ -1485,6 +1485,7 @@ local function startautofarm(map)
                 "ShedletskyFunny",
                 "SlasherSwift",
                 "Jason",
+				"JaneDoe",
             }
 
             if ab.Killers then
