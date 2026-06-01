@@ -5,8 +5,8 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local scriptversion = "v1.0.3"
-local updateperiod = "29/05/2026"
+local scriptversion = "v1.0.4"
+local updateperiod = "01/06/2026"
 
 local Window = Rayfield:CreateWindow({
     Name = "Sigmasaken",
@@ -122,7 +122,6 @@ local tts = game:GetService("TestService")
 local lp = players.LocalPlayer
 local playergui = lp.PlayerGui
 
-local playerexecutor = identifyexecutor()
 local mainremote = rs.Modules.Network.Network.RemoteEvent
 local ismobile = false
 if uis.TouchEnabled and not uis.MouseEnabled then
@@ -134,7 +133,7 @@ end
 
 -- tabs
 local ESPTab = Window:CreateTab("ESP", 89705354952445)
-local StaminaTab = Window:CreateTab("Stamina", 131988134488629)
+local StaminaTab = Window:CreateTab("Movement", 131988134488629)
 local MiscTab = Window:CreateTab("Misc", 125961818116791)
 local CombatTab = Window:CreateTab("Combat", 100914317336916)
 local AudioTab = Window:CreateTab("Music", 74530234897361)
@@ -162,6 +161,10 @@ local togglequestesp = false
 local togglebb = false
 local esptpn = 0.5
 
+local togglecf = false
+local adaprivecf = false
+local cfspeed = 20
+local cfmultiplier = 1
 local num1 = 100
 local num2 = 0
 local num3 = 20
@@ -175,6 +178,7 @@ local autopickupbloxy = false
 local autopickupmedkit = false
 local chatvisibility = false
 local togglewalktroughkilleronly = false
+local godmode = false
 local customjumppower = 0
 local fblooping = false
 local toggleinvis = false
@@ -249,6 +253,7 @@ local togglebettercontroll = false
 local controllll = 1
 local toggleautobackstab = false
 local autobackstabtype = "Tween"
+local usewithhitboxdrag = false
 local autolook = false
 local autobackstabtrigdist = 10
 local autobackstabdistance = 0.25
@@ -261,6 +266,7 @@ local togglefakeblock = false
 local hrp = lp.Character:WaitForChild("HumanoidRootPart", 5)
 local hum = lp.Character:WaitForChild("Humanoid", 5)
 local kick = false
+local toggledesync = false
 
 local currentanimationreplace = "None"
 local animationcode = nil
@@ -1748,9 +1754,51 @@ rgdl.ChildAdded:Connect(function(killed)
     end
 end)
 
+print("loaded ESP")
+
 local suc, err = pcall(function()
     local stamina = require(Sprinting)
 end)
+
+local cframecon
+cframecon = run.RenderStepped:Connect(function(dt)
+    if togglecf then
+        local hum = lp.Character:WaitForChild("Humanoid", 5)
+        local hrp = lp.Character:WaitForChild("HumanoidRootPart", 5)
+
+        local speed
+        if adaprivecf then
+            speed = hum.WalkSpeed * ((tonumber(cfmultiplier) or 1) / 2)
+        else
+            speed = cfspeed
+        end
+
+        print(speed)
+
+        hrp.CFrame = hrp.CFrame + hum.MoveDirection * speed * dt
+    end
+end)
+
+lp.CharacterAdded:Connect(function()
+    if cframecon then cframecon:Disconnect() cframecon = nil end
+
+    cframecon = run.RenderStepped:Connect(function(dt)
+        if togglecf then
+            local hum = lp.Character:WaitForChild("Humanoid", 5)
+            local hrp = lp.Character:WaitForChild("HumanoidRootPart", 5)
+
+            local speed
+            if adaprivecf then
+                speed = hum.WalkSpeed * (tonumber(cfmultiplier) / 2)
+            else
+                speed = cfspeed
+            end
+
+            hrp.CFrame = hrp.CFrame + hum.MoveDirection * speed * dt
+        end
+    end)
+end)
+
 
 if suc then
     local stamina = require(Sprinting)
@@ -1800,6 +1848,8 @@ if suc then
     end)
 end
 
+print("loaded Stamina")
+
 -- misc
 -- Invisibility:
 local function invisible(state)
@@ -1844,12 +1894,67 @@ task.spawn(function()
     end
 end)
 
+print("loaded Invisibility")
+
+-- God mode:
+local sucm, err = pcall(function()
+    local stamina = require(Sprinting)
+end)
+
+if sucm then
+    local gm = getrawmetatable(game)
+    local oldnamecall = gm.__namecall
+    local remote = game:GetService("ReplicatedStorage").Modules.Network.Network.UnreliableRemoteEvent
+    setreadonly(gm, false)
+
+    gm.__namecall = newcclosure(function(self, ...)
+        local method = getnamecallmethod()
+        local args = {...}
+        
+        if not checkcaller() and method == "FireServer" and self == remote and toggledesync then
+            return
+        end
+        
+        return oldnamecall(self, ...)
+    end)
+
+    setreadonly(gm, true)
+
+    lp.CharacterAdded:Connect(function()
+        task.wait(1)
+        if lp.Character.Parent.Name ~= "Spectating" then
+            if godmode then
+                toggledesync = false
+
+                task.wait(8)
+
+                local hrp = lp.Character:WaitForChild("HumanoidRootPart")
+
+                local last = hrp.CFrame
+                hrp.CFrame = CFrame.new(0, 100, 0)
+
+                task.wait(0.2)
+                toggledesync = true
+                task.wait(0.1)
+
+                hrp.CFrame = last
+            else
+                toggledesync = false
+            end
+        end
+    end)
+end
+
+print("loaded God mode")
+
 -- Chat visibility:
 textchat.ChatWindowConfiguration:GetPropertyChangedSignal("Enabled"):Connect(function()
     if chatvisibility then
         textchat.ChatWindowConfiguration.Enabled = true
     end
 end)
+
+print("loaded chat")
 
 -- Walk through killer only walls:
 local function walkthroughkillerwalls(folder)
@@ -1937,6 +2042,8 @@ task.spawn(function()
 		end
 	end
 end)
+
+print("loaded alot")
 
 -- Protect names:
 local function randomtext()
@@ -2378,6 +2485,8 @@ task.spawn(function()
 	end
 end)
 
+print("loaded misc")
+
 -- Jane doe insta charge:
 local sucs, er = pcall(function()
 	require(Sprinting)
@@ -2623,7 +2732,7 @@ local function soundblock(sound)
     autoblockconn = nil
 end
 
-run.RenderStepped:Connect(function()
+run.Heartbeat:Connect(function()
     if not currentkiller or not currentkiller:FindFirstChild("HumanoidRootPart") or lp.Character.Name ~= "Guest1337" or not currentkiller:FindFirstChild("HumanoidRootPart"):FindFirstChildOfClass("Sound") then return end
 
     for _, sound in pairs(currentkiller:FindFirstChild("HumanoidRootPart"):GetChildren()) do
@@ -3039,18 +3148,49 @@ mainremote.OnClientEvent:Connect(function(action, ability)
         end)
     else]]if autobackstabtype == "Teleport" then
         hrp.CFrame = killerhrp.CFrame * CFrame.new(0, 0, tonumber(autobackstabdistance))
+
+        if usewithhitboxdrag then
+            local c
+            c = run.Heartbeat:Connect(function()
+                if tick() - start > 0.8 then
+                    c:Disconnect()
+                    c = nil
+                    return
+                end
+
+                lp.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(killerhrp.CFrame * CFrame.new(0, 0, tonumber(autobackstabdistance)), lp.Character.HumanoidRootPart.AssemblyLinearVelocity))
+            end)
+        end
     elseif autobackstabtype == "Tween" then
         local tween = twin:Create(hrp, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), 
         {CFrame = killerhrp.CFrame * CFrame.new(0, 0, tonumber(autobackstabdistance))})
         tween:Play()
+
+        if usewithhitboxdrag then
+            local c
+            c = run.Heartbeat:Connect(function()
+                if tick() - start > 0.8 then
+                    c:Disconnect()
+                    c = nil
+                    return
+                end
+
+                lp.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(killerhrp.CFrame * CFrame.new(0, 0, tonumber(autobackstabdistance)), lp.Character.HumanoidRootPart.AssemblyLinearVelocity))
+            end)
+        end
     elseif autobackstabtype == "Hitbox Drag" then
-        conn = run.Heartbeat:Connect(function()
+        local c
+        c = run.Heartbeat:Connect(function()
             if tick() - start > 0.8 then
-                conn:Disconnect()
+                c:Disconnect()
+                c = nil
+                return
             end
 
             lp.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(killerhrp.CFrame * CFrame.new(0, 0, tonumber(autobackstabdistance)), lp.Character.HumanoidRootPart.AssemblyLinearVelocity))
+            require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(killerhrp.CFrame * CFrame.new(0, 0, tonumber(autobackstabdistance)), lp.Character.HumanoidRootPart.AssemblyLinearVelocity))
         end)
     end
 end)
@@ -5079,8 +5219,52 @@ local suc, err = pcall(function()
     local stamina = require(Sprinting)
 end)
 
+StaminaTab:CreateSection("CFrame walk")
+
+StaminaTab:CreateToggle({
+    Name = "Toggle CFrame walk (bypasses AC)",
+    Flag = "CFrameWalk",
+    CurrentValue = false,
+        Callback = function(Value)
+            togglecf = Value
+        end
+})
+
+StaminaTab:CreateToggle({
+    Name = "Toggle adaptive CFrame walk (adapts to your walkspeed)",
+    Flag = "CFrameWalkAdaptive",
+    CurrentValue = false,
+        Callback = function(Value)
+            adaprivecf = Value
+        end
+})
+
+StaminaTab:CreateSlider({
+	Name = "CFrame speed",
+	Range = {10, 40},
+    Suffix = "speed",
+    Flag = "CFrameSpeed",
+	Increment = 2,
+	CurrentValue = 20,
+    	Callback = function(Value)
+            cfspeed = Value
+    	end
+})
+
+StaminaTab:CreateSlider({
+	Name = "Adaptive CFrame multiplier",
+	Range = {1, 3},
+    Suffix = "x",
+    Flag = "AdaptiveCFrameSpeed",
+	Increment = 0.1,
+	CurrentValue = 1,
+    	Callback = function(Value)
+            cfmultiplier = Value
+    	end
+})
+
 if not suc then
-    StaminaTab:CreateLabel("Your environment doesn't support require.", 135861164604280)
+    StaminaTab:CreateLabel("Your executor doesn't support require, so no custom stamina settings.", 135861164604280)
 else
     StaminaTab:CreateSection("Survivor stamina settings")
 
@@ -5234,6 +5418,34 @@ MiscTab:CreateToggle({
 	CurrentValue = false,
     	Callback = function(Value)
             toggleinviswhensurv = Value
+    	end
+})
+
+MiscTab:CreateSection("GOD MODE")
+
+SettingsTab:CreateLabel("Its very balant and also disables hitbox expander & drags", 108404754717290)
+
+MiscTab:CreateToggle({
+	Name = "Toggle GOD MODE (makes u invisible too)",
+	Flag = "ToggleGODMODEEE",
+	CurrentValue = false,
+    	Callback = function(Value)
+            godmode = Value
+
+            if Value then
+                local hrp = lp.Character:WaitForChild("HumanoidRootPart")
+
+                local last = hrp.CFrame
+                hrp.CFrame = CFrame.new(0, 100, 0)
+
+                task.wait(0.2)
+                toggledesync = true
+                task.wait(0.1)
+
+                hrp.CFrame = last
+            else
+                toggledesync = false
+            end
     	end
 })
 
@@ -5979,6 +6191,15 @@ if suc then
         MultipleOptions = false,
             Callback = function(Options)
                 autobackstabtype = Options[1]
+            end
+    })
+
+    CombatTab:CreateToggle({
+        Name = "Use hitbox drag too (uses hitbox drag for teleport and tween)",
+        Flag = "ToggleUseHitboxDrag",
+        CurrentValue = false,
+            Callback = function(Value)
+                usewithhitboxdrag = Value
             end
     })
 else
@@ -7662,5 +7883,4 @@ task.spawn(function()
 	game:GetService("ReplicatedStorage"):WaitForChild("Modules", 10):WaitForChild("Network", 10):WaitForChild("Network", 10):WaitForChild("RemoteEvent", 10):FireServer(unpack(args))
 end)
 ]]
-
 
