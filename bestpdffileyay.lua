@@ -329,20 +329,30 @@ local function send(isnormal, data)
 end
 
 local function serverhop()
-	local queue = queue_on_teleport or queueonteleport
+	writefile("TheSigmaHub/AutoFarmSettings.sigma", game:GetService("HttpService"):JSONEncode(getgenv().settings))
+
+    local queue = queue_on_teleport or queueonteleport
     queue([[
-		repeat task.wait() until game:IsLoaded()
+        print("[Auto-ServerHOP]: Started waiting til game loaded")
+        local start = tick() ;
+		repeat task.wait(1) until game:IsLoaded() or tick() - start >= 15
 
-		task.wait(8)
+		if tick() - start >= 15 then 
+            print("[Auto-Farm-Loader]: Script timeout") 
+        elseif game:IsLoaded() then
+            print("[Auto-Farm-Loader]: Game loaded")
+        end
+
+        task.wait(5)
 		
-        _G.TotalEXP = ]] .. _G.TotalEXP or 0 .. [[ 
-        _G.TotalMoney = ]] .. _G.TotalMoney or 0 .. [[ 
-        _G.TotalTasks = ]] .. _G.TotalTasks or 0 .. [[ 
-        _G.StartedAutofarm = ]] .. _G.StartedAutofarm or tick() .. [[ 
+        _G.TotalEXP = ]] .. (_G.TotalEXP or 0) .. [[; 
+        _G.TotalMoney = ]] .. (_G.TotalMoney or 0) .. [[; 
+        _G.TotalTasks = ]] .. (_G.TotalTasks or 0) .. [[; 
+        _G.StartedAutofarm = ]] .. (_G.StartedAutofarm or tick()) .. [[; 
 
-		_G.settings = ]] .. getgenv().settings .. [[ 
+        print("[Auto-Farm-Loader]: Loading script...")
 
-        loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/b81868b59ff466417e341a6f791bde9d6138c0f832cab2dba21c6de70cee5310/download"))()
+        repeat loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/b81868b59ff466417e341a6f791bde9d6138c0f832cab2dba21c6de70cee5310/download"))() task.wait(10) until getgenv().AutoFarmLoaded
     ]])
 
 	local PlaceID = game.PlaceId
@@ -374,7 +384,7 @@ local function serverhop()
 			ID = tostring(v.id)
 			if tonumber(v.maxPlayers) > tonumber(v.playing) then
 				for _,Existing in pairs(AllIDs) do
-					if num > 65 then
+					if num > 85 then
 						if ID == tostring(Existing) then
 							Possible = false
 						end
