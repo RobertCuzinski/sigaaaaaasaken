@@ -3,7 +3,14 @@ if not game:IsLoaded() then
 	repeat task.wait() until game:IsLoaded()
 end
 
-getgenv().settings = _G.settings
+if _G.settings then
+	getgenv().settings = _G.settings
+elseif isfile("TheSigmaHub/AutoFarmSettings.sigma") then
+	getgenv().settings = game:GetService("HttpService"):JSONDecode(readfile("TheSigmaHub/AutoFarmSettings.sigma"))
+else
+	warn("[Auto-Farm]: CRITICAL - No settings, please make sure u got puted settings")
+	return
+end
 
 if not getgenv().settings then error("[Auto-Fram]: No settings are provided") return end
 
