@@ -1,5 +1,7 @@
-print("started waiting")
-repeat task.wait() until game:IsLoaded()
+if not game:IsLoaded() then
+	print("[Auto-Farm] Waiting game to load...")
+	repeat task.wait() until game:IsLoaded()
+end
 
 getgenv().settings = _G.settings
 
@@ -320,7 +322,8 @@ local function send(isnormal, data)
 end
 
 local function serverhop()
-    queueonteleport([[
+	local queue = queueonteleport or queue_on_teleport
+    queue([[
 		repeat task.wait() until game:IsLoaded()
 		
         _G.TotalEXP = ]] .. _G.TotalEXP or 0 .. [[ 
@@ -363,7 +366,7 @@ local function serverhop()
                 ID = tostring(v.id)
                 if tonumber(v.maxPlayers) > tonumber(v.playing) then
                     for _,Existing in pairs(AllIDs) do
-                        if num > 80 then
+                        if num > 65 then
                             if ID == tostring(Existing) then
                                 Possible = false
                             end
