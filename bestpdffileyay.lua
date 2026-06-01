@@ -1575,6 +1575,15 @@ lp.CharacterAdded:Connect(function()
     end
 end)
 
+players.ChildRemoved:Connect(function()
+    task.wait(1)
+    local a = 0
+    for _, v in pairs(players:GetChildren()) do
+        a += 1
+    end
+    if a == 1 then serverhop() end
+end)
+
 workspace.Map.Ingame.ChildAdded:Connect(function(a)
     task.wait(3)
     if a.Name == "Map" then
@@ -1614,3 +1623,10 @@ end)
 
 print("[Auto-Farm]: Started auto farm")
 getgenv().AutoFarmLoaded = true
+
+task.wait(1)
+local a = 0
+for _, v in pairs(players:GetChildren()) do
+	a += 1
+end
+if a == 1 then serverhop() end
