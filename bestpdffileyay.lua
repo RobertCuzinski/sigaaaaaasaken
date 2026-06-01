@@ -293,7 +293,7 @@ You have $]] .. lp.PlayerData.Stats.Currency.Money.Value .. [[ money now.]],
 {
 ["name"] = "Other:",
 ["value"] = [[Total time of auto-farm: ]] .. format(math.round(tick() - _G.StartedAutofarm)) .. [[ 
-Time spent on this round: ]] .. data.time .. [[ 
+Time spent on this round: ]] .. data.time .. [[s 
 Total tasks: ]] .. _G.TotalTasks .. [[ 
 Tasks made this round: ]] .. dealedtasks .. [[]],
 ["inline"] = false
