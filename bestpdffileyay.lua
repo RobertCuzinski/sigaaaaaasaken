@@ -317,14 +317,14 @@ Tasks made this round: ]] .. dealedtasks .. [[]],
             ["color"] = 0xb475f2,
             ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ"),
             ["fields"] = {
-                {
-                    ["name"] = "Bought:",
-                    ["value"] = [[Bought: ]] .. data.bought .. [[ for $]] .. data.amount .. [[ 
-                    And u have $]] .. data.money .. [[ now.]],
-                    ["inline"] = false
-                },
-            }
-        }
+{
+["name"] = "Bought:",
+["value"] = [[Bought: ]] .. data.bought .. [[ for $]] .. data.amount .. [[ 
+And u have $]] .. data.money .. [[ now.]],
+["inline"] = false
+},
+}
+}
 
         sendwebhook({
             name = w.WebhookName,
@@ -1566,6 +1566,9 @@ lp.CharacterAdded:Connect(function()
     task.wait(1)
     if lp.Character.Parent.Name == "Killers" then
         if not getgenv().settings.FarmAsKiller.Enabled then
+            local hrp = lp.Character:WaitForChild("HumanoidRootPart")
+            local hum = lp.Character:WaitForChild("Humanoid")
+
             hrp.CFrame = hrp.CFrame * CFrame.new(100, 100, 100)
             task.wait(0.8)
             hum.Health = 0
