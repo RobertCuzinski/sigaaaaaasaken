@@ -1773,8 +1773,6 @@ cframecon = run.RenderStepped:Connect(function(dt)
             speed = cfspeed
         end
 
-        print(speed)
-
         hrp.CFrame = hrp.CFrame + hum.MoveDirection * speed * dt
     end
 end)
