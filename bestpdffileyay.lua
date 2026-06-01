@@ -264,6 +264,12 @@ end
 
 local function send(isnormal, data)
     if isnormal then
+		local function format(s)
+			local m = math.floor(s / 60)
+			local scs = s % 60
+			return string.format("%02d:%02d", m, scs)
+		end
+		
         local autotype = getgenv().settings.AutoFarmSettings.PathFindMethod and "Legit" or "Balant"
         local w = getgenv().settings.Webhook
         local embeds = {
@@ -271,29 +277,29 @@ local function send(isnormal, data)
             ["color"] = 0xb475f2,
             ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ"),
             ["fields"] = {
-                {
-                    ["name"] = "EXP:",
-                    ["value"] = [[Total EXP gained: ]] .. _G.TotalEXP .. [[ 
-                    EXP gained this time: ]] .. gainedexp,
-                    ["inline"] = false
-                },
-                {
-                    ["name"] = "Money:",
-                    ["value"] = [[Total money gained: $]] .. _G.TotalMoney .. [[ 
-                    Money gained this time: ]] .. gainedmoney .. [[ 
-                    You have $]] .. lp.PlayerData.Stats.Currency.Money.Value .. [[ money now.]],
-                    ["inline"] = false
-                },
-                {
-                    ["name"] = "Other:",
-                    ["value"] = [[Total time of auto-farm: ]] .. math.round(tick() - _G.StartedAutofarm) .. [[ 
-                    Time spent on this round: ]] .. data.time .. [[ 
-                    Total tasks: ]] .. _G.TotalTasks .. [[ 
-                    Tasks made this round: ]] .. dealedtasks .. [[]],
-                    ["inline"] = false
-                },
-            }
-        }
+{
+["name"] = "EXP:",
+["value"] = [[Total EXP gained: ]] .. _G.TotalEXP .. [[ 
+EXP gained this time: ]] .. gainedexp,
+["inline"] = false
+},
+{
+["name"] = "Money:",
+["value"] = [[Total money gained: $]] .. _G.TotalMoney .. [[ 
+Money gained this time: ]] .. gainedmoney .. [[ 
+You have $]] .. lp.PlayerData.Stats.Currency.Money.Value .. [[ money now.]],
+["inline"] = false
+},
+{
+["name"] = "Other:",
+["value"] = [[Total time of auto-farm: ]] .. format(math.round(tick() - _G.StartedAutofarm)) .. [[ 
+Time spent on this round: ]] .. data.time .. [[ 
+Total tasks: ]] .. _G.TotalTasks .. [[ 
+Tasks made this round: ]] .. dealedtasks .. [[]],
+["inline"] = false
+},
+}
+}
 
         sendwebhook({
             name = w.WebhookName,
@@ -1255,6 +1261,7 @@ local function startautofarm(map)
                                 local start = tick()
                                 repeat
                                     run.RenderStepped:Wait()
+                                    if lp.Character.Parent.Name == "Spectating" then return "died" end
                                 until tick() - start >= g.Interval + (math.random() * g.Randomness) or 
                                 not prompt or 
                                 not playergui:FindFirstChild("PuzzleUI")
@@ -1272,6 +1279,7 @@ local function startautofarm(map)
                                 local start = tick()
                                 repeat
                                     run.RenderStepped:Wait()
+                                    if lp.Character.Parent.Name == "Spectating" then return "died" end
                                 until tick() - start >= g.Interval + (math.random() * g.Randomness) or 
                                 not prompt or 
                                 not playergui:FindFirstChild("PuzzleUI") or
@@ -1298,6 +1306,7 @@ local function startautofarm(map)
                                     local start = tick()
                                     repeat
                                         run.RenderStepped:Wait()
+                                        if lp.Character.Parent.Name == "Spectating" then return "died" end
                                     until tick() - start >= g.Interval + (math.random() * g.Randomness) or 
                                     not prompt or 
                                     not playergui:FindFirstChild("PuzzleUI") or
@@ -1321,6 +1330,7 @@ local function startautofarm(map)
                                     local start = tick()
                                     repeat
                                         run.RenderStepped:Wait()
+                                        if lp.Character.Parent.Name == "Spectating" then return "died" end
                                     until tick() - start >= g.Interval + (math.random() * g.Randomness) or 
                                     not prompt or 
                                     not playergui:FindFirstChild("PuzzleUI") or
@@ -1351,6 +1361,7 @@ local function startautofarm(map)
                                     local start = tick()
                                     repeat
                                         run.RenderStepped:Wait()
+                                        if lp.Character.Parent.Name == "Spectating" then return "died" end
                                     until tick() - start >= g.Interval + (math.random() * g.Randomness) or 
                                     not prompt or 
                                     not playergui:FindFirstChild("PuzzleUI")
@@ -1368,6 +1379,7 @@ local function startautofarm(map)
                                     local start = tick()
                                     repeat
                                         run.RenderStepped:Wait()
+                                        if lp.Character.Parent.Name == "Spectating" then return "died" end
                                     until tick() - start >= g.Interval + (math.random() * g.Randomness) or 
                                     not prompt or 
                                     not playergui:FindFirstChild("PuzzleUI")
@@ -1402,6 +1414,8 @@ local function startautofarm(map)
 
                 if scriptdebug then print("[DEBUG]: Status: " .. status) end
 
+                if lp.Character.Parent.Name == "Spectating" then return "died" end
+
                 if status == "Run4UrLife" and a.PathFindMethod then
                     runstatus = runforurlife(killer)
                 elseif status == "died" then
@@ -1426,11 +1440,13 @@ local function startautofarm(map)
             co += 1
 			status = dogens()
             repeat task.wait() until status
-        until co >= 50 or status == "died" or status == "FinishedAll"
+        until co >= 50 or status == "died" or status == "FinishedAll" or lp.Character.Parent.Name == "Spectating"
 
         if getgenv().settings.FarmEnd.AutoResetAfterCompleating then
-            hrp.CFrame = hrp.CFrame * CFrame.new(0, 100, 0)
+            hrp.CFrame = hrp.CFrame * CFrame.new(100, 100, 100)
+            task.wait(0.8)
             hum.Health = 0
+            task.wait(0.8)
             repeat hrp.CFrame = hrp.CFrame * CFrame.new(0, 100, 0) task.wait() until lp.CharacterAdded
         end
 
@@ -1545,6 +1561,19 @@ local function startautofarm(map)
         end
     end
 end
+
+lp.CharacterAdded:Connect(function()
+    task.wait(1)
+    if lp.Character.Parent.Name == "Killers" then
+        if not getgenv().settings.FarmAsKiller.Enabled then
+            hrp.CFrame = hrp.CFrame * CFrame.new(100, 100, 100)
+            task.wait(0.8)
+            hum.Health = 0
+            task.wait(0.8)
+            repeat hrp.CFrame = hrp.CFrame * CFrame.new(0, 100, 0) task.wait() until lp.CharacterAdded
+        end
+    end
+end)
 
 workspace.Map.Ingame.ChildAdded:Connect(function(a)
     task.wait(3)
