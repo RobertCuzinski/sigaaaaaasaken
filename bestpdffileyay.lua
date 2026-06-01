@@ -1574,3 +1574,4 @@ task.spawn(function()
 end)
 
 print("[Auto-Farm]: Started auto farm")
+getgenv().AutoFarmLoaded = true
