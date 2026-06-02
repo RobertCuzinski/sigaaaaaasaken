@@ -293,8 +293,8 @@ You have $]] .. lp.PlayerData.Stats.Currency.Money.Value .. [[ money now.]],
 {
 ["name"] = "Other:",
 ["value"] = [[Total time of auto-farm: ]] .. format(math.round(tick() - _G.StartedAutofarm)) .. [[ 
-Time spent on this round: ]] .. data.time .. [[s 
-Total tasks: ]] .. _G.TotalTasks .. [[ 
+Time spent on this round: ]] .. data.time .. [[ 
+Total tasks: ]] .. _G.TotalTasks .. [[s 
 Tasks made this round: ]] .. dealedtasks .. [[]],
 ["inline"] = false
 },
@@ -324,7 +324,7 @@ And u have $]] .. data.money .. [[ now.]],
 ["inline"] = false
 },
 }
-}
+        }
 
         sendwebhook({
             name = w.WebhookName,
@@ -361,77 +361,91 @@ local function serverhop()
         repeat loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/b81868b59ff466417e341a6f791bde9d6138c0f832cab2dba21c6de70cee5310/download"))() task.wait(10) until getgenv().AutoFarmLoaded
     ]])
 
-	local PlaceID = game.PlaceId
-	local AllIDs = {}
-	local foundAnything = ""
-	local actualHour = os.date("!*t").hour
-	local Deleted = false
-	local File = pcall(function()
-		AllIDs = game:GetService('HttpService'):JSONDecode(readfile("NotSameServers.json"))
-	end)
-	if not File then
-		table.insert(AllIDs, actualHour)
-		writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
-	end
-	function TPReturner()
-		local Site;
-		if foundAnything == "" then
-			Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
-		else
-			Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
-		end
-		local ID = ""
-		if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
-			foundAnything = Site.nextPageCursor
-		end
-		local num = 0;
-		for i,v in pairs(Site.data) do
-			local Possible = true
-			ID = tostring(v.id)
-			if tonumber(v.maxPlayers) > tonumber(v.playing) then
-				for _,Existing in pairs(AllIDs) do
-					if num > 85 then
-						if ID == tostring(Existing) then
-							Possible = false
-						end
-					else
-						if tonumber(actualHour) ~= tonumber(Existing) then
-							local delFile = pcall(function()
-								delfile("NotSameServers.json")
-								AllIDs = {}
-								table.insert(AllIDs, actualHour)
-							end)
-						end
-					end
-					num = num + 1
-				end
-				if Possible == true then
-					table.insert(AllIDs, ID)
-					wait()
-					pcall(function()
-						writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
-						wait()
-						game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
-					end)
-					wait(4)
-				end
-			end
-		end
-	end
+    if getgenv().settings.FarmEnd.ServerHopOnLowServer then
+        local PlaceID = game.PlaceId
+        local AllIDs = {}
+        local foundAnything = ""
+        local actualHour = os.date("!*t").hour
+        local Deleted = false
+        local File = pcall(function()
+            AllIDs = game:GetService('HttpService'):JSONDecode(readfile("NotSameServers.json"))
+        end)
+        if not File then
+            table.insert(AllIDs, actualHour)
+            writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+        end
+        function TPReturner()
+            local Site;
+            if foundAnything == "" then
+                Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100'))
+            else
+                Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100&cursor=' .. foundAnything))
+            end
+            local ID = ""
+            if Site.nextPageCursor and Site.nextPageCursor ~= "null" and Site.nextPageCursor ~= nil then
+                foundAnything = Site.nextPageCursor
+            end
+            local num = 0;
+            for i,v in pairs(Site.data) do
+                local Possible = true
+                ID = tostring(v.id)
+                if tonumber(v.maxPlayers) > tonumber(v.playing) then
+                    for _,Existing in pairs(AllIDs) do
+                        if num > 85 then
+                            if ID == tostring(Existing) then
+                                Possible = false
+                            end
+                        else
+                            if tonumber(actualHour) ~= tonumber(Existing) then
+                                local delFile = pcall(function()
+                                    delfile("NotSameServers.json")
+                                    AllIDs = {}
+                                    table.insert(AllIDs, actualHour)
+                                end)
+                            end
+                        end
+                        num = num + 1
+                    end
+                    if Possible == true then
+                        table.insert(AllIDs, ID)
+                        wait()
+                        pcall(function()
+                            writefile("NotSameServers.json", game:GetService('HttpService'):JSONEncode(AllIDs))
+                            wait()
+                            game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
+                        end)
+                        wait(4)
+                    end
+                end
+            end
+        end
 
-	function Teleport()
-		while wait() do
-			pcall(function()
-				TPReturner()
-				if foundAnything ~= "" then
-					TPReturner()
-				end
-			end)
-		end
-	end
+        function Teleport()
+            while wait() do
+                pcall(function()
+                    TPReturner()
+                    if foundAnything ~= "" then
+                        TPReturner()
+                    end
+                end)
+            end
+        end
 
-	Teleport()
+        Teleport()
+    else
+        game:GetService("TeleportService"):Teleport(game.PlaceId, lp)
+    end
 end
+
+game:GetService("GuiService").ErrorMessageChanged:Connect(function(errorr)
+    if errorr and errorr ~= "" then
+            if lp then
+                task.wait()
+                serverhop()
+            end
+        end
+    end
+end)
 
 local function killerlooksonu(k, v)
     local sets = getgenv().settings.AutoFarmSettings.FarmSettings
@@ -1485,7 +1499,7 @@ local function startautofarm(map)
                 "ShedletskyFunny",
                 "SlasherSwift",
                 "Jason",
-				"JaneDoe",
+                "JaneDoe",
             }
 
             if ab.Killers then
@@ -1557,7 +1571,8 @@ local function startautofarm(map)
 
         task.wait(4)
 
-        if getgenv().settings.FarmEnd.ServerHop then
+        if getgenv().settings.FarmEnd.ServerHopOnRandomServer or
+        getgenv().settings.FarmEnd.ServerHopOnLowServer then
             serverhop()
         end
     end
@@ -1631,6 +1646,6 @@ getgenv().AutoFarmLoaded = true
 task.wait(1)
 local a = 0
 for _, v in pairs(players:GetChildren()) do
-	a += 1
+    a += 1
 end
 if a == 1 then serverhop() end
