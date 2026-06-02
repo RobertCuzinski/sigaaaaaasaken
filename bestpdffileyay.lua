@@ -355,6 +355,7 @@ local function serverhop()
         _G.TotalMoney = ]] .. (_G.TotalMoney or 0) .. [[; 
         _G.TotalTasks = ]] .. (_G.TotalTasks or 0) .. [[; 
         _G.StartedAutofarm = ]] .. (_G.StartedAutofarm or tick()) .. [[; 
+        _G.DebugEnabled = ]] .. (scriptdebug or false) .. [[; 
 
         print("[Auto-Farm-Loader]: Loading script...")
 
