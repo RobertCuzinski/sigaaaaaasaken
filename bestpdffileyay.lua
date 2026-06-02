@@ -439,11 +439,10 @@ end
 
 game:GetService("GuiService").ErrorMessageChanged:Connect(function(errorr)
     if errorr and errorr ~= "" then
-            if lp then
-                task.wait()
-                serverhop()
-            end
-        end
+		if lp then
+			task.wait()
+			serverhop()
+		end
     end
 end)
 
