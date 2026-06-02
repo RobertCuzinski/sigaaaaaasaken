@@ -280,21 +280,21 @@ local function send(isnormal, data)
 {
 ["name"] = "EXP:",
 ["value"] = [[Total EXP gained: ]] .. _G.TotalEXP .. [[ 
-EXP gained this time: ]] .. gainedexp,
+EXP gained this round: ]] .. gainedexp,
 ["inline"] = false
 },
 {
 ["name"] = "Money:",
 ["value"] = [[Total money gained: $]] .. _G.TotalMoney .. [[ 
-Money gained this time: $]] .. gainedmoney .. [[ 
+Money gained this round: $]] .. gainedmoney .. [[ 
 You have $]] .. lp.PlayerData.Stats.Currency.Money.Value .. [[ money now.]],
 ["inline"] = false
 },
 {
 ["name"] = "Other:",
 ["value"] = [[Total time of auto-farm: ]] .. format(math.round(tick() - _G.StartedAutofarm)) .. [[ 
-Time spent on this round: ]] .. data.time .. [[ 
-Total tasks: ]] .. _G.TotalTasks .. [[s 
+Time spent on this round: ]] .. data.time .. [[s 
+Total tasks: ]] .. _G.TotalTasks .. [[ 
 Tasks made this round: ]] .. dealedtasks .. [[]],
 ["inline"] = false
 },
