@@ -1022,7 +1022,9 @@ local function startautofarm(map)
         task.wait(0.3)
     until hum and hrp and not hrp.Anchored and hum.WalkSpeed > 0
 
-    if getgenv().settings.AutoFarmSettings.Desync.TeleportUrCameraToUrHitbox then 
+    if getgenv().settings.AutoFarmSettings.Desync.TeleportUrCameraToUrHitbox and
+    getgenv().settings.AutoFarmSettings.Desync.Enabled and
+    not getgenv().settings.AutoFarmSettings.PathFindMethod then
         workspace.CurrentCamera.CameraSubject = lp.Character.QueryHitbox 
     end
 
