@@ -1,4 +1,3 @@
-
 if not isfolder("TheSigmaHub") then
     makefolder("TheSigmaHub")
 end
@@ -5481,7 +5480,7 @@ MiscTab:CreateToggle({
 
 MiscTab:CreateSection("GOD MODE")
 
-SettingsTab:CreateLabel("Its very balant and also disables hitbox expander & drags", 108404754717290)
+MiscTab:CreateLabel("Its very balant and also disables hitbox expander & drags", 108404754717290)
 
 MiscTab:CreateToggle({
 	Name = "Toggle GOD MODE (makes u invisible too)",
