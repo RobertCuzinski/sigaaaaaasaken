@@ -5,8 +5,8 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local scriptversion = "v1.0.4"
-local updateperiod = "01/06/2026"
+local scriptversion = "v1.0.5"
+local updateperiod = "16/06/2026"
 
 local Window = Rayfield:CreateWindow({
     Name = "Sigmasaken",
@@ -295,8 +295,18 @@ local timebeforegen = 4.5
 local timegenrandomize = 0
 local currentimage = "None"
 
-local sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
-local originalSize = sausageHolder.Size.X.Offset
+local sausageHolder
+local originalSize
+if game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame:FindFirstChild("UnibarMenu") and game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu:FindFirstChild("2") then
+    sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.UnibarMenu["2"]
+    originalSize = sausageHolder.Size.X.Offset
+elseif game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame:FindFirstChild("TopBarLeftContainer") and 
+    game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.TopBarLeftContainer:FindFirstChild("UnibarMenu") and 
+    game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.TopBarLeftContainer.UnibarMenu:FindFirstChild("2") then
+
+    sausageHolder = game.CoreGui.TopBarApp.TopBarApp.UnibarLeftFrame.TopBarLeftContainer.UnibarMenu:FindFirstChild("2")
+    originalSize = sausageHolder.Size.X.Offset
+end
 local usefbtoggle = false
 local useemote = false
 local useflip = false
@@ -1939,6 +1949,38 @@ if sucm then
             else
                 toggledesync = false
             end
+
+            local function checkifnear()
+                local hitbox = lp.Character:FindFirstChild("QueryHitbox")
+                if not hitbox then return false end
+
+                local distance = (hitbox.Position - Vector3.new(0, 100, 0)).Magnitude
+                if distance > 50 then
+                    toggledesync = false
+
+                    task.wait(2)
+
+                    local hrp = lp.Character:WaitForChild("HumanoidRootPart")
+
+                    local last = hrp.CFrame
+                    hrp.CFrame = CFrame.new(0, 100, 0)
+
+                    task.wait(0.2)
+                    toggledesync = true
+                    task.wait(0.1)
+
+                    hrp.CFrame = last
+                end
+                return true
+            end
+
+            task.spawn(function()
+                while task.wait(0.1) do
+                    if not godmode then repeat task.wait(0.1) until godmode end
+                    local a = checkifnear()
+                    if not a then task.wait(5) end
+                end
+            end)
         end
     end)
 end
@@ -2680,20 +2722,31 @@ local function extractsoundid(sound)
     return nil
 end
 
+local abparttt = Instance.new("Part")
+abparttt.CanCollide = false
+abparttt.Size = lp.Character.HumanoidRootPart.Size
+abparttt.Anchored = true
+abparttt.Transparency = 1
+abparttt.Parent = workspace
+
 local function soundblock(sound)
     if not toggleautoblock or not lp.Character.Name == "Guest1337" or autocd then return end
     if not sound or not sound:IsA("Sound") then return end
     if not sound.IsPlaying then return end
 
     local id = extractsoundid(sound)
-    if not id or not autoblocktrigers[id] then return end
+    if not id or not autoblocktrigers[tostring(id)] then return end
 
     local can = false
-    if (sound.TimePosition / sound.TimeLength) < 0.45 then can = true end
+    if (sound.TimePosition / sound.TimeLength) < 0.6 then can = true end
+
+    if not can then return end
 
     local isinpart = false
-    for _, part in pairs(workspace:GetPartsInPart(autoblockpart)) do
-        if part:IsDescendantOf(lp.Character) then
+    abparttt.CFrame = lp.Character.HumanoidRootPart.CFrame
+    for _, v in pairs(workspace:GetPartsInPart(autoblockpart)) do
+        if v.Parent == workspace.Hitboxes then continue end
+        if v:IsDescendantOf(lp.Character) or v.Parent == lp.Character or v == abparttt then
             isinpart = true
             break
         end
@@ -2704,10 +2757,11 @@ local function soundblock(sound)
     if autocd then return end
     if not autocd then autocd = true end
     
-    local punch = lp.PlayerGui.MainUI.AbilityContainer.Punch:FindFirstChild("Charges")
+    local punch = playergui.MainUI.AbilityContainer.Punch
     
     if not autoblockconn and autopunch then
-        autoblockconn = punch:GetPropertyChangedSignal("Text"):Connect(function()
+        autoblockconn = punch:GetPropertyChangedSignal("ImageColor3"):Connect(function()
+            print(punch.ImageColor3)
             task.wait(0.05)
             mainremote:FireServer("UseActorAbility", {
                 [1] = "Punch"
@@ -2730,12 +2784,17 @@ local function soundblock(sound)
     autoblockconn = nil
 end
 
-run.Heartbeat:Connect(function()
+run.RenderStepped:Connect(function()
+    local currentkiller
+    if kill:FindFirstChildWhichIsA("Model") then
+        currentkiller = kill:FindFirstChildWhichIsA("Model")
+    end
     if not currentkiller or not currentkiller:FindFirstChild("HumanoidRootPart") or lp.Character.Name ~= "Guest1337" or not currentkiller:FindFirstChild("HumanoidRootPart"):FindFirstChildOfClass("Sound") then return end
 
     for _, sound in pairs(currentkiller:FindFirstChild("HumanoidRootPart"):GetChildren()) do
-        if not sound:IsA("Sound") then continue end
-        soundblock(sound)        
+        if sound:IsA("Sound") then 
+            soundblock(sound)
+        end
     end
 end)
 
@@ -2902,6 +2961,7 @@ end
 
 if suc then 
     local mousemodule = require(rs.Systems.Player.Miscellaneous.GetPlayerMousePosition)
+    local mousefunc = mousemodule.GetMousePos
 
     mousemodule.GetMousePos = function(self, p2)
         if slientaim or killerssilentaim or toggleooblock then
@@ -2925,7 +2985,7 @@ if suc then
 			part.Position = res.Position
 			cursorpos = res.Position
 		else
-			cursorpos = mouse.Hit.Position
+			cursorpos = mousefunc(self, p2)
 		end
 
         return cursorpos
@@ -4946,7 +5006,7 @@ end
 
 lp.CharacterAdded:Connect(function(char)
     task.wait(5)
-    if char.Parent.Name ~= "Spectating" then
+    if char and char.Parent and char.Parent.Name ~= "Spectating" then
         Start()
     end
 end)
@@ -5239,7 +5299,7 @@ StaminaTab:CreateToggle({
 
 StaminaTab:CreateSlider({
 	Name = "CFrame speed",
-	Range = {10, 40},
+	Range = {2, 40},
     Suffix = "speed",
     Flag = "CFrameSpeed",
 	Increment = 2,
@@ -7079,100 +7139,101 @@ local gendrop = GeneratorTab:CreateDropdown({
 
 
 
-
-SettingsTab:CreateToggle({
-	Name = "Mobile fake block button",
-	Flag = "ToggleFakeBlockMobileButton",
-	CurrentValue = false,
-    	Callback = function(Value)
-            usefbtoggle = Value
-            local frame = sausageHolder:FindFirstChild("FBButtonFrame")
-            if Value then
-                if not frame then
-                    createButton("FB", "rbxassetid://127941180659201", function()
-                        if togglefakeblock then
-                            if fakeblockanimation == "Normal" then
-                                dofakeblock("rbxassetid://72722244508749")
-                            elseif fakeblockanimation == "Milestones" then
-                                dofakeblock("rbxassetid://96959123077498")
-                            elseif fakeblockanimation == "Bobby" then
-                                dofakeblock("rbxassetid://95802026624883")
-                            else
-                                dofakeblock("rbxassetid://82605295530067")
+if sausageHolder then
+    SettingsTab:CreateToggle({
+        Name = "Mobile fake block button",
+        Flag = "ToggleFakeBlockMobileButton",
+        CurrentValue = false,
+            Callback = function(Value)
+                usefbtoggle = Value
+                local frame = sausageHolder:FindFirstChild("FBButtonFrame")
+                if Value then
+                    if not frame then
+                        createButton("FB", "rbxassetid://127941180659201", function()
+                            if togglefakeblock then
+                                if fakeblockanimation == "Normal" then
+                                    dofakeblock("rbxassetid://72722244508749")
+                                elseif fakeblockanimation == "Milestones" then
+                                    dofakeblock("rbxassetid://96959123077498")
+                                elseif fakeblockanimation == "Bobby" then
+                                    dofakeblock("rbxassetid://95802026624883")
+                                else
+                                    dofakeblock("rbxassetid://82605295530067")
+                                end
                             end
-                        end
-                    end)
+                        end)
+                    end
+                elseif frame then
+                    frame:Destroy()
                 end
-            elseif frame then
-                frame:Destroy()
+                updateButtons()
             end
-            updateButtons()
-    	end
-})
+    })
 
-SettingsTab:CreateToggle({
-	Name = "Mobile emote GUI button",
-	Flag = "ToggleEmoteMobileButton",
-	CurrentValue = false,
-    	Callback = function(Value)
-            useemote = Value
-            local frame = sausageHolder:FindFirstChild("EmoteButtonFrame")
-            if Value then
-                if not frame then
-                    createButton("Emote", "rbxassetid://122042941416087", SigmaHubEmoteGUI)
+    SettingsTab:CreateToggle({
+        Name = "Mobile emote GUI button",
+        Flag = "ToggleEmoteMobileButton",
+        CurrentValue = false,
+            Callback = function(Value)
+                useemote = Value
+                local frame = sausageHolder:FindFirstChild("EmoteButtonFrame")
+                if Value then
+                    if not frame then
+                        createButton("Emote", "rbxassetid://122042941416087", SigmaHubEmoteGUI)
+                    end
+                elseif frame then
+                    frame:Destroy()
                 end
-            elseif frame then
-                frame:Destroy()
+                updateButtons()
             end
-            updateButtons()
-    	end
-})
+    })
 
-SettingsTab:CreateToggle({
-	Name = "Mobile frontflip button",
-	Flag = "ToggleFrontflipMobileButton",
-	CurrentValue = false,
-    	Callback = function(Value)
-            useflip = Value
-            local frame = sausageHolder:FindFirstChild("FlipButtonFrame")
-            if Value then
-                if not frame then
-                    createButton("Flip", "rbxassetid://78380333361977", FLIP)
+    SettingsTab:CreateToggle({
+        Name = "Mobile frontflip button",
+        Flag = "ToggleFrontflipMobileButton",
+        CurrentValue = false,
+            Callback = function(Value)
+                useflip = Value
+                local frame = sausageHolder:FindFirstChild("FlipButtonFrame")
+                if Value then
+                    if not frame then
+                        createButton("Flip", "rbxassetid://78380333361977", FLIP)
+                    end
+                elseif frame then
+                    frame:Destroy()
                 end
-            elseif frame then
-                frame:Destroy()
+                updateButtons()
             end
-            updateButtons()
-    	end
-})
+    })
 
-SettingsTab:CreateToggle({
-	Name = "Mobile force 1 generator puzzle button",
-	Flag = "ToggleGeneratorMobileButton",
-	CurrentValue = false,
-    	Callback = function(Value)
-            usegenerator = Value
-            local frame = sausageHolder:FindFirstChild("GeneratorButtonFrame")
-            if Value then
-                if not frame then
-                    createButton("Generator", "rbxassetid://123328058062196", function()
-                        if game.workspace.Map.Ingame:FindFirstChild("Map") then
-                            for _, gen in pairs(game.workspace.Map.Ingame:FindFirstChild("Map"):GetChildren()) do
-                                if gen.Name == "Generator" and gen:FindFirstChild("Main") and gen:FindFirstChild("Main"):FindFirstChildOfClass("ProximityPrompt") then
-                                    if gen:FindFirstChildOfClass("ProximityPrompt").Enabled == false then
-                                        dotask(gen)
+    SettingsTab:CreateToggle({
+        Name = "Mobile force 1 generator puzzle button",
+        Flag = "ToggleGeneratorMobileButton",
+        CurrentValue = false,
+            Callback = function(Value)
+                usegenerator = Value
+                local frame = sausageHolder:FindFirstChild("GeneratorButtonFrame")
+                if Value then
+                    if not frame then
+                        createButton("Generator", "rbxassetid://123328058062196", function()
+                            if game.workspace.Map.Ingame:FindFirstChild("Map") then
+                                for _, gen in pairs(game.workspace.Map.Ingame:FindFirstChild("Map"):GetChildren()) do
+                                    if gen.Name == "Generator" and gen:FindFirstChild("Main") and gen:FindFirstChild("Main"):FindFirstChildOfClass("ProximityPrompt") then
+                                        if gen:FindFirstChildOfClass("ProximityPrompt").Enabled == false then
+                                            dotask(gen)
+                                        end
                                     end
                                 end
                             end
-                        end
-                    end)
+                        end)
+                    end
+                elseif frame then
+                    frame:Destroy()
                 end
-            elseif frame then
-                frame:Destroy()
+                updateButtons()
             end
-            updateButtons()
-    	end
-})
+    })
+end
 
 SettingsTab:CreateDivider()
 
