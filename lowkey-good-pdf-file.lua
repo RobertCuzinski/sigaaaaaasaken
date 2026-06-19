@@ -5,7 +5,7 @@ end
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local scriptversion = "v1.0.5 (1)"
-local updateperiod = "16/06/2026"
+local updateperiod = "19/06/2026"
 
 local Window = Rayfield:CreateWindow({
     Name = "Sigmasaken",
@@ -5634,7 +5634,7 @@ MiscTab:CreateButton({
 
 MiscTab:CreateDropdown({
     Name = "Change/spoof your profile device",
-    Flag = "ChangeDeviceDropdown",
+    Flag = "ChangeDeviceDropdown1",
     Options = {"Disable","Mobile","PC","Console","Unknown"},
     CurrentOption = {"Disable"},
     MultipleOptions = false,
