@@ -4,7 +4,7 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local scriptversion = "v1.0.5"
+local scriptversion = "v1.0.5 (1)"
 local updateperiod = "16/06/2026"
 
 local Window = Rayfield:CreateWindow({
@@ -5651,6 +5651,7 @@ MiscTab:CreateDropdown({
 })
 
 MiscTab:CreateLabel("Spoofing your device may cause certain keybinds to break, such as Veeronica's spray and Nosferatu's minigame.", 95387370402049)
+MiscTab:CreateLabel("Also if you will use this on mobile it will make u UNABLE TO SPRINT so u should not use it on mobile.", 95387370402049)
 
 MiscTab:CreateSection("Auto coinflip")
 
