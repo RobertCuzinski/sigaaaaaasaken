@@ -5631,7 +5631,7 @@ MiscTab:CreateButton({
             NameProtect(true)
     	end
 })
-
+--[[
 MiscTab:CreateDropdown({
     Name = "Change/spoof your profile device",
     Flag = "ChangeDeviceDropdown1",
@@ -5652,7 +5652,7 @@ MiscTab:CreateDropdown({
 
 MiscTab:CreateLabel("Spoofing your device may cause certain keybinds to break, such as Veeronica's spray and Nosferatu's minigame.", 95387370402049)
 MiscTab:CreateLabel("Also if you will use this on mobile it will make u UNABLE TO SPRINT so u should not use it on mobile.", 95387370402049)
-
+]]
 MiscTab:CreateSection("Auto coinflip")
 
 MiscTab:CreateToggle({
