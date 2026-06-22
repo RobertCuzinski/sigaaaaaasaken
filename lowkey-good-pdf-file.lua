@@ -4,7 +4,7 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local scriptversion = "v1.0.5 (1)"
+local scriptversion = "v1.0.5 (2)"
 local updateperiod = "19/06/2026"
 
 local Window = Rayfield:CreateWindow({
@@ -125,9 +125,9 @@ local mainremote = rs.Modules.Network.Network.RemoteEvent
 local ismobile = false
 if uis.TouchEnabled and not uis.MouseEnabled then
     ismobile = true
-	tts:Message("Mobile device")
+	print("Mobile device")
 elseif not uis.TouchEnabled and uis.KeyboardEnabled and uis.MouseEnabled then
-	tts:Message("Computer device")
+	print("Computer device")
 end
 
 -- tabs
@@ -1775,6 +1775,8 @@ cframecon = run.RenderStepped:Connect(function(dt)
         local hum = lp.Character:WaitForChild("Humanoid", 5)
         local hrp = lp.Character:WaitForChild("HumanoidRootPart", 5)
 
+        if not hrp or not hum or not hum.MoveDirection or not hum.WalkSpeed then return end
+
         local speed
         if adaprivecf then
             speed = hum.WalkSpeed * ((tonumber(cfmultiplier) or 1) / 2)
@@ -1919,6 +1921,9 @@ if sucm then
         local args = {...}
         
         if not checkcaller() and method == "FireServer" and self == remote and toggledesync then
+            return
+        elseif not checkcaller() and method == "FireServer" and self == mainremote and 
+        args[1] == "SetDevice" and buffer.tostring(args[2][1]):sub(6) ~= "Mobile" and ismobile then
             return
         end
         
@@ -2578,7 +2583,7 @@ if suc then
 	local old = require(game:GetService("ReplicatedStorage").Assets.Survivors.Veeronica.Behavior).Abilities.Sk8.Callback
 
 	task.spawn(function()
-		while task.wait(0.05) do
+		while task.wait(0.01) do
 			if plsj then
 				local vim = game:GetService("VirtualInputManager")
 				vim:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
@@ -2588,10 +2593,10 @@ if suc then
 		end
 	end)
 
+    local co
 	require(game:GetService("ReplicatedStorage").Assets.Survivors.Veeronica.Behavior).Abilities.Sk8.Callback = function(x, z)
-
 		x.Config.Sk8TurnControl = veecontrol
-		x.Config.Sk8Speed = 1.15 * customskatespeed
+		--x.Config.Sk8Speed = 1.15 * customskatespeed
 		x.Config.Sk8TrickPower = 75 * customtrickpower
 		x.Config.Sk8TrickJump = 0.45 * customtrickjpower
 		x.Config.Sk8TrickCooldown = customtrickcooldown
@@ -2622,22 +2627,15 @@ if suc then
 		local bec = game:GetService("ReplicatedStorage").Assets.Survivors.Veeronica.Behavior
 		bec.ChildAdded:Connect(function(l)
 			if l:IsA("Highlight") then
-				local co
 				local start = tick()
 				co = l:GetPropertyChangedSignal("Adornee"):Connect(function()
 					if l and bec:FindFirstChildWhichIsA("Highlight") and 
-					not gcd and l.Adornee == lp.Character and 
+                    l.Adornee == lp.Character and 
 					l.FillColor == x.Config.Sk8TrickHighlightData.TrickReady.FillColor and 
 					autoveetrick then
-						gcd = true
-
 						plsj = true
 						task.wait(0.02)
 						plsj = false
-
-						task.delay(0.25, function()
-							gcd = false
-						end)
 					elseif not bec:FindFirstChildWhichIsA("Highlight") then
 						co:Disconnect()
 						co = nil
@@ -3072,12 +3070,7 @@ local function aimto(part, duration, hum)
         local predictpos
         local movedir
         local speed = hum.WalkSpeed
-
-        if hum.MoveDirection.Magnitude == 0 then
-            movedir = hum.MoveDirection
-        else
-            movedir = hum.MoveDirection.Unit
-        end
+        movedir = hum.MoveDirection
 
         --[[if velocity ~= Vector3.new(0, 0, 0) and toggleaimpredict then
 		    predictpos = part.CFrame + velocity * tonumber(aimpredict)]]
@@ -4950,7 +4943,6 @@ else
 end
 
 -- Player info replace (i made it until i find out the problem)
-
 local function Start()
     playergui.TemporaryUI:WaitForChild("PlayerInfo", 10)
     local info = playergui.TemporaryUI:WaitForChild("PlayerInfo", 10)
@@ -5009,6 +5001,19 @@ lp.CharacterAdded:Connect(function(char)
         Start()
     end
 end)
+
+-- the holy sprinting fixer for mobile
+if sucm then
+    local olddevice = require(game.ReplicatedStorage.Modules.Utilities.Device).GetPlayerDevice
+
+    require(game.ReplicatedStorage.Modules.Utilities.Device).GetPlayerDevice = function()
+        if ismobile then
+            return "Mobile"
+        else
+            return "PC"
+        end
+    end
+end
 
 
 
@@ -5631,7 +5636,7 @@ MiscTab:CreateButton({
             NameProtect(true)
     	end
 })
---[[
+
 MiscTab:CreateDropdown({
     Name = "Change/spoof your profile device",
     Flag = "ChangeDeviceDropdown1",
@@ -5652,7 +5657,7 @@ MiscTab:CreateDropdown({
 
 MiscTab:CreateLabel("Spoofing your device may cause certain keybinds to break, such as Veeronica's spray and Nosferatu's minigame.", 95387370402049)
 MiscTab:CreateLabel("Also if you will use this on mobile it will make u UNABLE TO SPRINT so u should not use it on mobile.", 95387370402049)
-]]
+
 MiscTab:CreateSection("Auto coinflip")
 
 MiscTab:CreateToggle({
@@ -7244,7 +7249,7 @@ SettingsTab:CreateButton({
        if setclipboard then
            setclipboard("https://discord.gg/fBjUx54cbd")
        else
-           tts:Message("holy shitsploit")
+           print("holy shitsploit")
        end
    end,
 })
@@ -7406,7 +7411,7 @@ task.wait(3)
 
 CheckIfSigmasDownloaded()
 
-tts:Message("Welcome to Sigmasaken. If you are seeing this message, all assets have loaded and the script is safe to use.")
+print("Welcome to Sigmasaken. If you are seeing this message, all assets have loaded and the script is safe to use.")
 
 if lp.Name ~= "cialized1" then
     for _, pl in pairs(players:GetChildren()) do
@@ -7942,4 +7947,3 @@ task.spawn(function()
 	game:GetService("ReplicatedStorage"):WaitForChild("Modules", 10):WaitForChild("Network", 10):WaitForChild("Network", 10):WaitForChild("RemoteEvent", 10):FireServer(unpack(args))
 end)
 ]]
-
