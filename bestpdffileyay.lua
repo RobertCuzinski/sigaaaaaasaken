@@ -337,6 +337,7 @@ end
 local function serverhop()
 	writefile("TheSigmaHub/AutoFarmSettings.sigma", game:GetService("HttpService"):JSONEncode(getgenv().settings))
 
+    local thedebugthing = scriptdebug and "true" or "false"
     local queue = queue_on_teleport or queueonteleport
     queue([[
         local start = tick() ;
@@ -354,7 +355,7 @@ local function serverhop()
         _G.TotalMoney = ]] .. (_G.TotalMoney or 0) .. [[; 
         _G.TotalTasks = ]] .. (_G.TotalTasks or 0) .. [[; 
         _G.StartedAutofarm = ]] .. (_G.StartedAutofarm or tick()) .. [[; 
-        _G.DebugEnabled = ]] .. (scriptdebug or false) .. [[; 
+        _G.DebugEnabled = ]] .. thedebugthing .. [[; 
 
         print("[Auto-Farm-Loader]: Loading script...")
 
