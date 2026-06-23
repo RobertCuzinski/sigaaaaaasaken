@@ -337,7 +337,6 @@ end
 local function serverhop()
 	writefile("TheSigmaHub/AutoFarmSettings.sigma", game:GetService("HttpService"):JSONEncode(getgenv().settings))
 
-    task.spawn(function()
     local queue = queue_on_teleport or queueonteleport
     queue([[
         local start = tick() ;
@@ -361,7 +360,6 @@ local function serverhop()
 
         repeat loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/b81868b59ff466417e341a6f791bde9d6138c0f832cab2dba21c6de70cee5310/download"))() task.wait(20) until getgenv().AutoFarmLoaded
     ]])
-    end)
 
     task.wait(0.1)
 
@@ -1152,6 +1150,7 @@ local function startautofarm(map)
         if scriptdebug then print("[DEBUG]: Spawned stamina controller") end
     end
 
+    local a = getgenv().settings.AutoFarmSettings
     if a.BecomeInvisible and not a.PathFindMethod then
         local an = Instance.new("Animation")
         an.AnimationId = "rbxassetid://75804462760596"
@@ -1194,7 +1193,7 @@ local function startautofarm(map)
 
         if scriptdebug then print("[DEBUG]: Starting searching gens") end
 
--        for _, gen in pairs(workspace.Map.Ingame.Map:GetChildren()) do
+        for _, gen in pairs(workspace.Map.Ingame.Map:GetChildren()) do
             if gen.Name == "Generator" then
                 table.insert(gens, gen)
                 if scriptdebug then print("[DEBUG]: Found generator: " .. gen:GetFullName()) end
@@ -1547,7 +1546,7 @@ local function startautofarm(map)
             repeat task.wait() until status
         until co >= 50 or status == "died" or status == "FinishedAll" or lp.Character.Parent.Name == "Spectating"
 
-        lp.Character.Parent.Name ~= "Spectating" then
+        if lp.Character.Parent.Name ~= "Spectating" then
             if getgenv().settings.FarmEnd.AutoResetAfterCompleating then
                 hrp.CFrame = hrp.CFrame * CFrame.new(100, 100, 100)
                 task.wait(0.8)
@@ -1666,7 +1665,7 @@ local function startautofarm(map)
 
         if getgenv().settings.FarmEnd.ServerHopOnRandomServer or
         getgenv().settings.FarmEnd.ServerHopOnLowServer then
-			if scriptdebug then print("[Auto-Farm]: Server hoping") end
+            if scriptdebug then print("[Auto-Farm]: Server hoping...") end
             serverhop()
         end
     end
