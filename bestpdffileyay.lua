@@ -435,6 +435,7 @@ local function serverhop()
     else
         game:GetService("TeleportService"):Teleport(game.PlaceId, lp)
     end
+	game:GetService("TeleportService"):Teleport(game.PlaceId, lp)
 end
 
 game:GetService("GuiService").ErrorMessageChanged:Connect(function(errorr)
