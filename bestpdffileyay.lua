@@ -359,7 +359,7 @@ local function serverhop()
 
         print("[Auto-Farm-Loader]: Loading script...")
 
-        repeat loadstring(game:HttpGet('https://raw.githubusercontent.com/sigmaboy-sigma-boy/TheSigmaHub/refs/heads/main/AutoFarm.lua'))() task.wait(20) until getgenv().AutoFarmLoaded
+        repeat loadstring(game:HttpGet('https://gate.sirius.menu/gateway?id=sid_23ktfex4agop'))() task.wait(20) until getgenv().AutoFarmLoaded
     ]])
 
     task.wait(0.1)
