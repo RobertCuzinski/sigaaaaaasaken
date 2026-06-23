@@ -280,13 +280,13 @@ local function send(isnormal, data)
 {
 ["name"] = "EXP:",
 ["value"] = [[Total EXP gained: ]] .. _G.TotalEXP .. [[ 
-EXP gained this round: ]] .. gainedexp,
+EXP gained this time: ]] .. gainedexp,
 ["inline"] = false
 },
 {
 ["name"] = "Money:",
 ["value"] = [[Total money gained: $]] .. _G.TotalMoney .. [[ 
-Money gained this round: $]] .. gainedmoney .. [[ 
+Money gained this time: $]] .. gainedmoney .. [[ 
 You have $]] .. lp.PlayerData.Stats.Currency.Money.Value .. [[ money now.]],
 ["inline"] = false
 },
@@ -339,7 +339,6 @@ local function serverhop()
 
     local queue = queue_on_teleport or queueonteleport
     queue([[
-        print("[Auto-ServerHOP]: Started waiting til game loaded")
         local start = tick() ;
 		repeat task.wait(1) until game:IsLoaded() or tick() - start >= 15
 
@@ -359,7 +358,7 @@ local function serverhop()
 
         print("[Auto-Farm-Loader]: Loading script...")
 
-        repeat loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/b81868b59ff466417e341a6f791bde9d6138c0f832cab2dba21c6de70cee5310/download"))() task.wait(10) until getgenv().AutoFarmLoaded
+        repeat loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/b81868b59ff466417e341a6f791bde9d6138c0f832cab2dba21c6de70cee5310/download"))() task.wait(20) until getgenv().AutoFarmLoaded
     ]])
 
     if getgenv().settings.FarmEnd.ServerHopOnLowServer then
@@ -440,10 +439,10 @@ end
 
 game:GetService("GuiService").ErrorMessageChanged:Connect(function(errorr)
     if errorr and errorr ~= "" then
-		if lp then
-			task.wait()
-			serverhop()
-		end
+        if lp then
+            task.wait()
+            serverhop()
+        end
     end
 end)
 
@@ -509,7 +508,7 @@ local function goto(obj, nttp, checkifneed)
     end
 
     local path = pathf:CreatePath({
-        AgentRadius = 3.25,
+        AgentRadius = 3,
         AgentHeight = 5,
         AgentCanJump = false
     })
@@ -546,10 +545,6 @@ local function goto(obj, nttp, checkifneed)
             sprint.StaminaGain = tonumber(s.CustomStaminaGain)
             if scriptdebug then print("[DEBUG]: Set custom stamina gain") end
         end
-
-        sprint.IsSprinting = true
-        sprint.__sprintedEvent:Fire(true)
-        sprint:Toggle(true)
     end
 
     for _, point in ipairs(points) do
@@ -634,7 +629,7 @@ local function runforurlife(killer)
     local function findfurthestpoint()
 		local function issave(pos)
 			local path = pathf:CreatePath({
-				AgentRadius = 2,
+				AgentRadius = 1,
 				AgentHeight = 5,
 				AgentCanJump = false,
 			})
@@ -925,6 +920,98 @@ local function runforurlife(killer)
 	end
 end
 
+local function targetermode(plr)
+    
+end
+
+local function findclosestplr(plrs)
+    local closest = nil
+    local hrp = lp.Character:WaitForChild("HumanoidRootPart")
+    local dist = math.huge
+
+    for _, v in pairs(plrs) do
+        if not v:FindFirstChild("Humanoid") then
+            continue
+        end
+
+        local hum = v:FindFirstChild("Humanoid")
+
+        if hum.Health > 0 and (v.PrimaryPart.Position - hrp.Position).Magnitude < dist then
+            dist = (v.PrimaryPart.Position - hrp.Position).Magnitude
+            closest = v
+        end
+    end
+
+    return closest
+end
+
+local function findfurthestplr(plrs)
+	local closest = nil
+	local hrp = lp.Character:WaitForChild("HumanoidRootPart")
+	local dists = -math.huge
+
+	for _, v in pairs(plrs) do
+        if not v:FindFirstChild("Humanoid") then
+            continue
+        end
+
+        local hum = v:FindFirstChild("Humanoid")
+
+		if hum.Health > 0 then
+			local dist = (v.PrimaryPart.Position - hrp.Position).Magnitude
+
+			if dist > dists then
+				dists = dist
+				closest = v
+			end
+		end
+	end
+
+	return closest
+end
+
+local function findlowestplr(plrs)
+	local best = nil
+	local hp = math.huge
+
+	for _, v in pairs(plrs) do
+        if not v:FindFirstChild("Humanoid") then
+            continue
+        end
+
+        local hum = v:FindFirstChild("Humanoid")
+
+		if hum.Health > 0 and hum.Health < hp then
+            hp = hum.Health
+            best = v
+		end
+	end
+
+	return best
+end
+
+local function findrandom(plrs)
+    local niceplrs = {}
+
+    for _, v in pairs(plrs) do
+        if not v:FindFirstChild("Humanoid") then
+            continue
+        end
+
+        local hum = v:FindFirstChild("Humanoid")
+
+		if hum.Health > 0 then
+            table.insert(niceplrs, v)
+		end
+	end
+
+    if #niceplrs > 0 then
+        return niceplrs[math.random(#niceplrs)]
+    end
+
+    return nil
+end
+
 local function findclosest(gens, gencd)
     local closest = nil
     local hrp = lp.Character:WaitForChild("HumanoidRootPart")
@@ -1025,7 +1112,7 @@ local function startautofarm(map)
 
     if getgenv().settings.AutoFarmSettings.Desync.TeleportUrCameraToUrHitbox and
     getgenv().settings.AutoFarmSettings.Desync.Enabled and
-    not getgenv().settings.AutoFarmSettings.PathFindMethod then
+    not getgenv().settings.AutoFarmSettings.PathFindMethod then 
         workspace.CurrentCamera.CameraSubject = lp.Character.QueryHitbox 
     end
 
@@ -1060,6 +1147,41 @@ local function startautofarm(map)
         if scriptdebug then print("[DEBUG]: Spawned stamina controller") end
     end
 
+    if a.BecomeInvisible and not a.PathFindMethod then
+        local an = Instance.new("Animation")
+        an.AnimationId = "rbxassetid://75804462760596"
+
+        invis = hum:FindFirstChildWhichIsA("Animator"):LoadAnimation(an)
+        invis:Play()
+        invis:AdjustSpeed(0)
+        local hrp = lp.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then hrp.Transparency = 0.8 end
+
+        if scriptdebug then print("[DEBUG]: Turned on invisibility") end
+    end
+
+    if a.Desync.Enabled and not a.PathFindMethod then
+        toggledesync = false
+
+        local lastframe
+        if a.Desync.DesyncInVoid then
+            lastframe = hrp.CFrame
+            hrp.CFrame = CFrame.new(0, 100, 0)
+            if scriptdebug then print("[DEBUG]: Teleported to void") end
+            task.wait(0.2)
+        end
+
+        toggledesync = true
+        if scriptdebug then print("[DEBUG]: Turned on desync") end
+
+        task.wait(0.2)
+
+        if a.Desync.DesyncInVoid then
+            hrp.CFrame = lastframe
+            if scriptdebug then print("[DEBUG]: Teleported back") end
+        end
+    end
+
     if lp.Character.Parent.Name == "Survivors" then
         local gens = {}
         local gencd = nil
@@ -1067,7 +1189,7 @@ local function startautofarm(map)
 
         if scriptdebug then print("[DEBUG]: Starting searching gens") end
 
-        for _, gen in pairs(workspace.Map.Ingame.Map:GetChildren()) do
+-        for _, gen in pairs(workspace.Map.Ingame.Map:GetChildren()) do
             if gen.Name == "Generator" then
                 table.insert(gens, gen)
                 if scriptdebug then print("[DEBUG]: Found generator: " .. gen:GetFullName()) end
@@ -1092,41 +1214,6 @@ local function startautofarm(map)
             end
         end
 
-        if a.BecomeInvisible and not a.PathFindMethod then
-            local an = Instance.new("Animation")
-            an.AnimationId = "rbxassetid://75804462760596"
-
-            invis = hum:FindFirstChildWhichIsA("Animator"):LoadAnimation(an)
-            invis:Play()
-            invis:AdjustSpeed(0)
-            local hrp = lp.Character:FindFirstChild("HumanoidRootPart")
-            if hrp then hrp.Transparency = 0.8 end
-
-            if scriptdebug then print("[DEBUG]: Turned on invisibility") end
-        end
-
-        if a.Desync.Enabled and not a.PathFindMethod then
-            toggledesync = false
-
-            local lastframe
-            if a.Desync.DesyncInVoid then
-                lastframe = hrp.CFrame
-                hrp.CFrame = CFrame.new(0, 100, 0)
-                if scriptdebug then print("[DEBUG]: Teleported to void") end
-                task.wait(0.2)
-            end
-
-            toggledesync = true
-            if scriptdebug then print("[DEBUG]: Turned on desync") end
-
-			task.wait(0.2)
-
-            if a.Desync.DesyncInVoid then
-                hrp.CFrame = lastframe
-                if scriptdebug then print("[DEBUG]: Teleported back") end
-            end
-        end
-
         task.delay(3, function()
             if a.AutoEatGhostBurgerOrCloneOrCrouch then
                 if lp.Character.Name == "Noob" then
@@ -1148,15 +1235,12 @@ local function startautofarm(map)
             end
         end)
 
-        local hpcon
-
         local function dogens()
-            if not hpcon then
-
-
-            end
+            if lp.Character.Parent.Name == "Spectating" then return "died" end
 
             for _, v in pairs(gens) do
+                if lp.Character.Parent.Name == "Spectating" then return "died" end
+
                 if b.SurvivorGeneratorFind == "Random" then
                     besttodo = findrandom(gens, gencd)
                 elseif b.SurvivorGeneratorFind == "Closest" or not killer then
@@ -1458,12 +1542,14 @@ local function startautofarm(map)
             repeat task.wait() until status
         until co >= 50 or status == "died" or status == "FinishedAll" or lp.Character.Parent.Name == "Spectating"
 
-        if getgenv().settings.FarmEnd.AutoResetAfterCompleating then
-            hrp.CFrame = hrp.CFrame * CFrame.new(100, 100, 100)
-            task.wait(0.8)
-            hum.Health = 0
-            task.wait(0.8)
-            repeat hrp.CFrame = hrp.CFrame * CFrame.new(0, 100, 0) task.wait() until lp.CharacterAdded
+        lp.Character.Parent.Name ~= "Spectating" then
+            if getgenv().settings.FarmEnd.AutoResetAfterCompleating then
+                hrp.CFrame = hrp.CFrame * CFrame.new(100, 100, 100)
+                task.wait(0.8)
+                hum.Health = 0
+                task.wait(0.8)
+                repeat hrp.CFrame = hrp.CFrame * CFrame.new(0, 100, 0) task.wait() until lp.CharacterAdded
+            end
         end
 
         task.wait(1)
@@ -1492,7 +1578,7 @@ local function startautofarm(map)
             }
         }]]
 
-        if ab.Enabled and support then
+        if ab.Enabled and support and getgenv().settings.FarmEnd.AutoResetAfterCompleating then
             local block = {
                 "1xFunny",
                 "TwoTime_FortniteWay",
