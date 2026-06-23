@@ -337,6 +337,7 @@ end
 local function serverhop()
 	writefile("TheSigmaHub/AutoFarmSettings.sigma", game:GetService("HttpService"):JSONEncode(getgenv().settings))
 
+    task.spawn(function()
     local queue = queue_on_teleport or queueonteleport
     queue([[
         local start = tick() ;
@@ -360,6 +361,9 @@ local function serverhop()
 
         repeat loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/b81868b59ff466417e341a6f791bde9d6138c0f832cab2dba21c6de70cee5310/download"))() task.wait(20) until getgenv().AutoFarmLoaded
     ]])
+    end)
+
+    task.wait(0.1)
 
     if getgenv().settings.FarmEnd.ServerHopOnLowServer then
         local PlaceID = game.PlaceId
@@ -391,7 +395,7 @@ local function serverhop()
                 ID = tostring(v.id)
                 if tonumber(v.maxPlayers) > tonumber(v.playing) then
                     for _,Existing in pairs(AllIDs) do
-                        if num > 85 then
+                        if num > 55 then
                             if ID == tostring(Existing) then
                                 Possible = false
                             end
@@ -433,9 +437,9 @@ local function serverhop()
 
         Teleport()
     else
-        game:GetService("TeleportService"):Teleport(game.PlaceId, lp)
+        while task.wait() do game:GetService("TeleportService"):Teleport(game.PlaceId, lp) end
     end
-	game:GetService("TeleportService"):Teleport(game.PlaceId, lp)
+    while task.wait() do game:GetService("TeleportService"):Teleport(game.PlaceId, lp) end
 end
 
 game:GetService("GuiService").ErrorMessageChanged:Connect(function(errorr)
