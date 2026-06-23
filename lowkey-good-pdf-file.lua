@@ -7128,6 +7128,93 @@ GeneratorTab:CreateSlider({
     	end
 })
 
+GeneratorTab:CreateSection("Auto-Farm")
+
+GeneratorTab:CreateButton({
+	Name = "Copy auto-farm script",
+    	Callback = function()
+            setclipboard([[
+_G.settings = {
+    -- Legit farm is broken for some maps so its not really recommended
+    ["AutoFarmSettings"] = {
+        ["PathFindMethod"] = false, -- Enabling this will make pathfind instead of teleporting (disables some functions like desync, inisibility etc)
+        ["PathFindTimeOut"] = 25, -- Timeout for pathfind bcuz it can bug out 25 by default
+        ["BecomeInvisible"] = false, -- Killer can see u using scripts or by using abilities to highligh players
+        ["AutoEatGhostBurgerOrCloneOrCrouch"] = true, -- Automatically eats ghost burger, makes clone or crouches at start of the round
+        ["ResetIfLMS"] = true, -- Automatically resets if you are last survivor (true by default)
+        ["Desync"] = {
+            ["Enabled"] = true, -- WARNING!!! Can cause lag on mobile 
+            ["DesyncInVoid"] = true, -- literally god mode and u are invisible for everyone (recomended to use with GeneratorFarmType on Do1Task)
+            ["TeleportUrCameraToUrHitbox"] = true, -- dont makes anything but makes u feel safer
+        }, 
+        ["FarmSettings"] = {
+            ["KillerSurvivorFind"] = "Lowest", -- Closest, LowestHP, Furthest, Random (Lowest by default)
+            ["SurvivorGeneratorFind"] = "FurthestOfTheKiller", -- Closest, FurthestOfTheKiller, Random (Closest by default)
+            ["GeneratorFarmType"] = "DoFullGen", -- DoFullGen, Do1Task (DoFullGen by default and Do1Task only works without PathFindMethod)
+            ["TimeoutFor1LoopSpot"] = 20, -- 20 by default
+            ["SaveFromKillerDist"] = 50, -- 40 by default
+        }
+    },
+    ["Stamina"] = {
+        ["InfStamina"] = false, -- false by default
+        ["CustomSurvivorsRunSpeed"] = 28.5, -- 26 by default
+        ["CustomKillersRunSpeed"] = 29, -- 28 by default
+        ["CustomStaminaGain"] = 30, -- 25 by default
+        ["CustomStaminaLoss"] = 8, -- 10 by default
+        ["StaminaManagment"] = {
+            ["Enabled"] = true, -- true by default
+            ["StopSprintStamina"] = 5, -- you can put here math.random(minimum, maximum) for randomness
+            ["StartSprintStamina"] = 50, -- you can put here math.random(minimum, maximum) for randomness
+        }
+    },
+    ["AutoGenerator"] = {
+        ["Interval"] = 1.5, -- 6 by default
+        ["Randomness"] = 0, -- 1 by default
+        ["AutoFinish1TaskWhenEntringGenerator"] = true -- false by default
+    },
+    ["AutoBuy"] = { -- Turn on AutoResetAfterCompleating to make it work
+        ["Enabled"] = true, -- false by default
+        ["Killers"] = true, -- true by default
+        ["Survivors"] = true, -- true by default
+        --["Emotes"] = false, -- false by default W.I.P.
+        --["SurvivorsSkins"] = false, -- false by default W.I.P.
+        --["KillersSkins"] = false, -- false by default W.I.P.
+    }, 
+    ["FarmAsKiller"] = { -- DOESNT WORK BECAUSE ITS W.I.P.
+        ["Enabled"] = false, -- true by default W.I.P.
+        ["UseHitboxExpander"] = true, -- -- WARNING!!! Balant, dont work with desync and false by default W.I.P.
+    },
+    ["FarmOnlyWhenKillerIs"] = {
+        ["Enabled"] = false, -- false by default
+        ["Noli"] = true, -- true by default
+        ["c00lkid"] = true, 
+        ["Sixer"] = true,
+        ["Slasher"] = false,
+        ["JohnDoe"] = false,
+        ["Nosferatu"] = true,
+        ["1x1x1x1"] = false,
+        ["ServerHopIfWrongKiller"] = true,
+        ["ResetIfWrongKiller"] = false, 
+    },
+    ["FarmEnd"] = {
+        ["ServerHopOnRandomServer"] = true,
+        ["ServerHopOnLowServer"] = false,
+        ["AutoResetAfterCompleating"] = true, -- Survivors only
+    },
+    ["Webhook"] = {
+        ["Enabled"] = false, -- Sends message after finishing auto farm 
+        ["WebhookLink"] = "", -- Webhook link
+        ["WebhookName"] = "Sigmasaken Auto-farm", -- Title
+        ["SendWhenBoughtSomthing"] = true,
+    },
+}
+
+
+loadstring(game:HttpGet('https://raw.githubusercontent.com/sigmaboy-sigma-boy/TheSigmaHub/refs/heads/main/AutoFarm.lua'))()
+			]])
+    	end
+})
+				
 GeneratorTab:CreateSection("Generator image")
 
 local gendrop = GeneratorTab:CreateDropdown({
