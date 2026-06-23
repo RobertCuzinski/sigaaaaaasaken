@@ -1661,6 +1661,7 @@ local function startautofarm(map)
 
         if getgenv().settings.FarmEnd.ServerHopOnRandomServer or
         getgenv().settings.FarmEnd.ServerHopOnLowServer then
+			if scriptdebug then print("[Auto-Farm]: Server hoping") end
             serverhop()
         end
     end
