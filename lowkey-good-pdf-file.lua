@@ -4,8 +4,8 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local scriptversion = "v1.0.5 (2)"
-local updateperiod = "19/06/2026"
+local scriptversion = "v1.0.5 (3)"
+local updateperiod = "24/06/2026"
 
 local Window = Rayfield:CreateWindow({
     Name = "Sigmasaken",
@@ -122,11 +122,11 @@ local lp = players.LocalPlayer
 local playergui = lp.PlayerGui
 
 local mainremote = rs.Modules.Network.Network.RemoteEvent
-local ismobile = false
-if uis.TouchEnabled and not uis.MouseEnabled then
+local ismobile = true
+if uis.TouchEnabled then
     ismobile = true
 	print("Mobile device")
-elseif not uis.TouchEnabled and uis.KeyboardEnabled and uis.MouseEnabled then
+else
 	print("Computer device")
 end
 
@@ -139,8 +139,6 @@ local AudioTab = Window:CreateTab("Music", 74530234897361)
 local FunTab = Window:CreateTab("Fun", 70414744064346)
 local GeneratorTab = Window:CreateTab("Objectives", 93079123429781)
 local SettingsTab = Window:CreateTab("Settings", 102842005215871)
-
-task.spawn(function()
 
 local rgdl = game.workspace:FindFirstChild("Ragdolls")
 local ingamefolder = workspace.Map.Ingame
@@ -159,6 +157,8 @@ local toggleritualesp = false
 local togglequestesp = false
 local togglebb = false
 local esptpn = 0.5
+
+task.spawn(function()
 
 local togglecf = false
 local adaprivecf = false
@@ -238,7 +238,7 @@ local predictiontime = 0.4
 local slientaim = false
 local killerssilentaim = false
 local curs
-local enablecursor = ismobile
+local enablecursor = false
 local cursorypos = 20
 local mousepos = nil
 local slientaimtype = "Killer"
@@ -5015,6 +5015,22 @@ if sucm then
     end
 end
 
+if ismobile and sucm then
+    task.spawn(function()
+        while task.wait() do
+            local a = require(Sprinting)
+            if not a.BindsEnabled then
+                a.BindsEnabled = true
+            else
+                repeat
+                    a = require(Sprinting)
+                    task.wait(0.1)
+                until not a.BindsEnabled
+            end
+        end
+    end)
+end
+
 
 
 
@@ -6201,7 +6217,7 @@ CombatTab:CreateSection("Crosshair")
 CombatTab:CreateToggle({
     Name = "Enable crosshair",
     Flag = "ToggleCursor",
-    CurrentValue = ismobile,
+    CurrentValue = false,
         Callback = function(Value)
             enablecursor = Value
             curs.Visible = Value
@@ -6353,9 +6369,8 @@ if suc then
         (target.Position - lp.Character.HumanoidRootPart.Position).Magnitude <= hdist then
 			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, (target.Position - lp.Character.HumanoidRootPart.Position) / 10))
 			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, (target.Position - (lp.Character.HumanoidRootPart.Position) / 10) * 2))
-			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, (target.Position - (lp.Character.HumanoidRootPart.Position) / 10) * 3))
-			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, (target.Position - (lp.Character.HumanoidRootPart.Position) / 10) * 4))
-			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, (target.Position - (lp.Character.HumanoidRootPart.Position) / 10) * 5))
+            require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, (target.Position - lp.Character.HumanoidRootPart.Position) / 10))
+			require(game:GetService("ReplicatedStorage").Modules.Network.Network):FireServerConnection("UpdateCharacterPosition", "UREMOTE_EVENT", require(game.ReplicatedStorage.Systems.Player.Game.CharacterReplication).Serialize(target.CFrame, (target.Position - (lp.Character.HumanoidRootPart.Position) / 10) * 2))
 		elseif target and not jh3 and jh2 and not jh and not bjh and 
         (target.Position - lp.Character.HumanoidRootPart.Position).Magnitude <= hdist then
 			lp.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
