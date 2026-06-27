@@ -4,8 +4,8 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-local scriptversion = "v1.0.5 (3)"
-local updateperiod = "24/06/2026"
+local scriptversion = "v1.0.6"
+local updateperiod = "27/06/2026"
 
 local Window = Rayfield:CreateWindow({
     Name = "Sigmasaken",
@@ -175,6 +175,7 @@ local num6 = false
 
 local autopickupbloxy = false
 local autopickupmedkit = false
+local mutefootsteps = false
 local chatvisibility = false
 local togglewalktroughkilleronly = false
 local godmode = false
@@ -1999,6 +2000,24 @@ textchat.ChatWindowConfiguration:GetPropertyChangedSignal("Enabled"):Connect(fun
 end)
 
 print("loaded chat")
+
+-- Mute footsteps:
+local mutefcon
+
+lp.CharacterAdded:Connect(function(char)
+    repeat task.wait() until char.Parent
+
+    if mutefootstep then
+        if mutefcon then mutefcon:Disconnect() mutefcon = nil end
+
+        mutefcon = char:GetAttributeChangedSignal("FootstepsMuted"):Connect(function()
+            if not char:GetAttribute("FootstepsMuted") and mutefootstep then
+                char:SetAttribute("FootstepsMuted", true)
+            end
+        end)
+        lp.Character:SetAttribute("FootstepsMuted", true)
+    end
+end)
 
 -- Walk through killer only walls:
 local function walkthroughkillerwalls(folder)
@@ -5004,15 +5023,49 @@ end)
 
 -- the holy sprinting fixer for mobile
 if sucm then
-    local olddevice = require(game.ReplicatedStorage.Modules.Utilities.Device).GetPlayerDevice
+    local dev = require(game.ReplicatedStorage.Modules.Utilities.Device)
 
-    require(game.ReplicatedStorage.Modules.Utilities.Device).GetPlayerDevice = function()
+    dev.GetPlayerDevice = function()
         if ismobile then
             return "Mobile"
         else
             return "PC"
         end
     end
+
+    function dev:GetPlayerDevice()
+        if ismobile then
+            return "Mobile"
+        else
+            return "PC"
+        end
+    end
+
+    task.spawn(function()
+        while task.wait(0.1) do
+            if not ismobile then break end
+
+            if dev:GetPlayerDevice() ~= "Mobile" or dev.GetPlayerDevice() ~= "Mobile" then
+                dev = require(game.ReplicatedStorage.Modules.Utilities.Device)
+
+                dev.GetPlayerDevice = function()
+                    if ismobile then
+                        return "Mobile"
+                    else
+                        return "PC"
+                    end
+                end
+
+                function dev:GetPlayerDevice()
+                    if ismobile then
+                        return "Mobile"
+                    else
+                        return "PC"
+                    end
+                end
+            end
+        end
+    end)
 end
 
 if ismobile and sucm then
@@ -5029,6 +5082,8 @@ if ismobile and sucm then
             end
         end
     end)
+
+    --playergui.MainUI.SprintingButton.MouseButton1Down
 end
 
 
@@ -5528,6 +5583,30 @@ MiscTab:CreateToggle({
 })
 
 MiscTab:CreateSection("Other")
+
+MiscTab:CreateToggle({
+	Name = "Mute your footsteps (for everyone)",
+	Flag = "MuteYourFootsteps",
+	CurrentValue = false,
+    	Callback = function(Value)
+            mutefootstep = Value
+
+            if Value and lp.Character then
+                if mutefcon then mutefcon:Disconnect() mutefcon = nil end
+                mutefcon = lp.Character:GetAttributeChangedSignal("FootstepsMuted"):Connect(function()
+                    if not lp.Character:GetAttribute("FootstepsMuted") and mutefootstep then
+                        lp.Character:SetAttribute("FootstepsMuted", true)
+                    end
+                end)
+
+                lp.Character:SetAttribute("FootstepsMuted", true)
+            elseif lp.Character then
+                if mutefcon then mutefcon:Disconnect() mutefcon = nil end
+
+                lp.Character:SetAttribute("FootstepsMuted", nil)
+            end
+    	end
+})
 
 MiscTab:CreateToggle({
 	Name = "Toggle chat visibility",
