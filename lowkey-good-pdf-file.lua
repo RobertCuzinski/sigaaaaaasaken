@@ -122,7 +122,7 @@ local lp = players.LocalPlayer
 local playergui = lp.PlayerGui
 
 local mainremote = rs.Modules.Network.Network.RemoteEvent
-local ismobile = true
+local ismobile = false
 if uis.TouchEnabled then
     ismobile = true
 	print("Mobile device")
